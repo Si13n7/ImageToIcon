@@ -1,4 +1,4 @@
-[![Release](https://img.shields.io/badge/Release-v18.3.4-brightgreen.svg?style=plastic)](https://github.com/Si13n7/ImageToIcon/releases/latest) [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=plastic)](https://github.com/Si13n7/ImageToIcon/blob/master/LICENSE.txt)
+[![Release](https://img.shields.io/badge/Release-v18.6.29-brightgreen.svg?style=plastic)](https://github.com/Si13n7/ImageToIcon/releases/latest) [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=plastic)](https://github.com/Si13n7/ImageToIcon/blob/master/LICENSE.txt)
 
 ***
 
