@@ -94,7 +94,7 @@
                         return;
                     label.BackgroundImage = !newBgImg.Size.Equals(label.Size) ? newBgImg.Redraw(label.Width, label.Height) : newBgImg;
                 };
-                label.DrawBorder(color, ControlEx.BorderStyle.Dashed);
+                ControlEx.DrawBorder(label, color, ControlEx.BorderStyle.Dashed);
                 ImgPanel.Controls.Add(label);
             }
             ImgPanel.ResumeLayout();
