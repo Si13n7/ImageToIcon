@@ -1,6 +1,6 @@
-The MIT License(MIT)
+The MIT License (MIT)
 
-Copyright(c) 2016, Si13n7 'Roy Schroedel' Developments(r)
+Copyright (C) 2018 Si13n7 Developments (R), Roy Schroedel
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the 'Software'), to deal
