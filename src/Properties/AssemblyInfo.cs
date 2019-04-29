@@ -8,10 +8,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Convert Image to Icon")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Si13n7 Dev. ®")]
+[assembly: AssemblyCompany("Si13n7 Dev.™")]
 [assembly: AssemblyProduct("ImageToIcon")]
-[assembly: AssemblyCopyright("Copyright © Si13n7 Dev. ® 2018")]
-[assembly: AssemblyTrademark("Si13n7 Dev. ®")]
+[assembly: AssemblyCopyright("Copyright © Si13n7 Dev.™ 2019")]
+[assembly: AssemblyTrademark("Si13n7 Dev.™")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("18.6.29.0")]
-[assembly: AssemblyFileVersion("18.6.29.0")]
+[assembly: AssemblyVersion("19.4.29.0")]
+[assembly: AssemblyFileVersion("19.4.29.0")]
