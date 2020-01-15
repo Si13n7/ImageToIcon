@@ -1,0 +1,3 @@
+[submodule "refs/SilDev/CSharpLib"]
+	path = refs/SilDev/CSharpLib
+	url = https://github.com/SilDev/CSharpLib.git
