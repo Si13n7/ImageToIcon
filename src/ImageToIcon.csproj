@@ -2,13 +2,19 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <SuppressLegacyCodeAnalysisDeprecatedWarning>true</SuppressLegacyCodeAnalysisDeprecatedWarning>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{80F4A31D-BB95-4ED1-95CE-E1057389BEF8}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>ImageToIcon</RootNamespace>
     <AssemblyName>ImageToIcon</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -43,8 +49,8 @@
     <StartupObject>ImageToIcon.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SilDev.CSharpLib">
-      <HintPath>..\..\SilDev.CSharpLib\bin\SilDev.CSharpLib.dll</HintPath>
+    <Reference Include="SilDev.CSharpLib32">
+      <HintPath>..\refs\SilDev\CSharpLib\bin\SilDev.CSharpLib32.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
