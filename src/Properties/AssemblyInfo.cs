@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Convert Image to Icon")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Image to Icon")]
+[assembly: AssemblyDescription("Convert image to icon")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Si13n7 Dev.™")]
 [assembly: AssemblyProduct("ImageToIcon")]
-[assembly: AssemblyCopyright("Copyright © Si13n7 Dev.™ 2020")]
+[assembly: AssemblyCopyright("Copyright © Si13n7 Dev.™ 2023")]
 [assembly: AssemblyTrademark("Si13n7 Dev.™")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("20.1.15.0")]
-[assembly: AssemblyFileVersion("20.1.15.0")]
+[assembly: AssemblyVersion("23.12.6.0")]
+[assembly: AssemblyFileVersion("23.12.6.0")]
