@@ -51,7 +51,8 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SilDev.CSharpLib">
+    <Reference Include="SilDev.CSharpLib, Version=23.12.24.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\refs\SilDev\CSharpLib\bin\SilDev.CSharpLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
