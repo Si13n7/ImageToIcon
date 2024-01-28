@@ -12,28 +12,14 @@
     using SilDev.Drawing;
     using SilDev.Forms;
     using SilDev.Ini.Legacy;
+    using static SilDev.WinApi;
+    using SharpPngEncoder = SixLabors.ImageSharp.Formats.Png.PngEncoder;
+    using SharpImage = SixLabors.ImageSharp.Image;
 
     public partial class MainForm : Form
     {
         private static string _fileName;
-
-        public sealed override Size MaximumSize
-        {
-            get => base.MaximumSize;
-            set => base.MaximumSize = value;
-        }
-
-        public sealed override Size MinimumSize
-        {
-            get => base.MinimumSize;
-            set => base.MinimumSize = value;
-        }
-
-        public sealed override Color BackColor
-        {
-            get => base.BackColor;
-            set => base.BackColor = value;
-        }
+        private static readonly List<string> TmpFiles = new();
 
         public MainForm()
         {
@@ -44,26 +30,52 @@
             var dpi = Desktop.GetDpi();
             if (dpi > 96f)
             {
-                MinimumSize = new(MinimumSize.Width, GetDpiDimension(MinimumSize.Height, dpi));
-                Size = MinimumSize;
+                base.MinimumSize = new(base.MinimumSize.Width, GetDpiDimension(base.MinimumSize.Height, dpi));
+                Size = base.MinimumSize;
             }
 
             if (Desktop.AppsUseDarkTheme)
             {
                 this.EnableDarkMode();
                 this.ChangeColorMode(ControlExColorMode.DarkDarkDark);
-                BackColor = Color.FromArgb(32, 32, 32);
+                base.BackColor = Color.FromArgb(32, 32, 32);
             }
 
             ResumeLayout(false);
+            return;
+
+            static int GetDpiDimension(int i, float dpi, bool upscale = false)
+            {
+                if (upscale)
+                    return (int)Math.Round(i / 96f * dpi - dpi / 1.5f);
+                return (int)Math.Round(i / dpi * 96f + dpi / 1.5f);
+            }
         }
 
-        private static int GetDpiDimension(int i, float dpi, bool upscale = false)
+        private static Image LoadImageFromPath(string path)
         {
-            if (upscale)
-                return (int)Math.Round(i / 96f * dpi - dpi / 1.5f);
-            return (int)Math.Round(i / dpi * 96f + dpi / 1.5f);
+            try
+            {
+                if (!path.EndsWithEx(".webp"))
+                    return new Bitmap(path);
+                var tmpFile = FileEx.GetUniqueTempPath();
+                using (var webp = SharpImage.Load(path))
+                {
+                    using var png = new FileStream(tmpFile, FileMode.Create);
+                    webp.Save(png, new SharpPngEncoder());
+                }
+                TmpFiles.Add(tmpFile);
+                return new Bitmap(tmpFile);
+            }
+            catch (Exception ex) when (ex.IsCaught())
+            {
+                Log.Write(ex);
+                return default;
+            }
         }
+
+        private static Image ValidateImageSize(Image image, Size size) =>
+            !image.Size.Equals(size) ? image.Redraw(size.Width, size.Height) : image;
 
         private void MainForm_Load(object sender, EventArgs e)
         {
@@ -73,6 +85,7 @@
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            TmpFiles.ForEach(x => CmdExec.WaitForExitThenDelete(x, ProcessEx.CurrentName));
             if (Extended.Checked == Ini.Read("Settings", nameof(Extended), false))
                 return;
             Ini.WriteDirect("Settings", nameof(Extended), Extended.Checked);
@@ -98,54 +111,6 @@
             var images = ImgPanel.Controls.Cast<Control>().Select(x => (Image)x.BackgroundImage.Clone());
             IconFactory.Save(images, dialog.FileName);
             MessageBoxEx.Show(this, "File successfully saved!", Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-        }
-
-        private void Label_MouseEnter(object sender, EventArgs e)
-        {
-            if (sender is not Label owner)
-                return;
-            toolTip.SetToolTip(owner, $"{owner.Text}x{owner.Text}");
-            owner.Cursor = Cursors.Hand;
-        }
-
-        private void Label_MouseLeave(object sender, EventArgs e)
-        {
-            if (sender is not Label owner)
-                return;
-            toolTip.RemoveAll();
-            owner.Cursor = Cursors.Default;
-        }
-
-        private void Label_DragEnter(object sender, DragEventArgs e)
-        {
-            if (sender is not Label)
-                return;
-            e.Effect = DragDropEffects.Copy;
-        }
-
-        private void Label_DragDrop(object sender, DragEventArgs e)
-        {
-            if (sender is not Label owner || e.Data.GetData(DataFormats.FileDrop, false) is not string[] paths)
-                return;
-            try
-            {
-                var bmp = new Bitmap(paths.First());
-                owner.BackgroundImage = bmp.Redraw(owner.Width);
-            }
-            catch (Exception ex) when (ex.IsCaught())
-            {
-                Log.Write(ex);
-            }
-        }
-
-        private void Label_Click(object sender, EventArgs e)
-        {
-            if (sender is not Label owner)
-                return;
-            var newBgImg = OpenImageFileDialog();
-            if (newBgImg == null)
-                return;
-            owner.BackgroundImage = !newBgImg.Size.Equals(owner.Size) ? newBgImg.Redraw(owner.Width, owner.Height) : newBgImg;
         }
 
         private void UpdateImages(Image image, bool centerWindow = false)
@@ -177,11 +142,11 @@
                                       TextAlign = ContentAlignment.TopRight
                                   })
             {
-                label.MouseEnter += Label_MouseEnter;
-                label.MouseLeave += Label_MouseLeave;
-                label.DragEnter += Label_DragEnter;
-                label.DragDrop += Label_DragDrop;
-                label.Click += Label_Click;
+                label.MouseEnter += LocalLabelMouseEnter;
+                label.MouseLeave += LocalLabelMouseLeave;
+                label.DragEnter += LocalLabelDragEnter;
+                label.DragDrop += LocalLabelDragDrop;
+                label.Click += LocalLabelClick;
                 ControlEx.DrawBorder(label, color, ControlExBorderStyle.Dashed);
                 ImgPanel.Controls.Add(label);
             }
@@ -200,12 +165,56 @@
             if (Log.DebugMode > 0)
                 Log.Write($"New width: {width}");
             if (centerWindow)
-                WinApi.NativeHelper.CenterWindow(Handle);
+                NativeHelper.CenterWindow(Handle);
 
             ImgPanel.ResumeLayout();
             ResumeLayout();
 
             Icon = image.ToIcon();
+            return;
+
+            static void LocalLabelDragEnter(object sender, DragEventArgs e)
+            {
+                if (sender is not Label)
+                    return;
+                e.Effect = DragDropEffects.Copy;
+            }
+
+            static void LocalLabelDragDrop(object sender, DragEventArgs e)
+            {
+                if (sender is not Label owner || e.Data.GetData(DataFormats.FileDrop, false) is not string[] paths)
+                    return;
+                var newBgImg = LoadImageFromPath(paths.FirstOrDefault());
+                if (newBgImg == null)
+                    return;
+                owner.BackgroundImage = ValidateImageSize(newBgImg, owner.Size);
+            }
+
+            void LocalLabelMouseEnter(object sender, EventArgs e)
+            {
+                if (sender is not Label owner)
+                    return;
+                toolTip.SetToolTip(owner, $"{owner.Text}x{owner.Text}");
+                owner.Cursor = Cursors.Hand;
+            }
+
+            void LocalLabelMouseLeave(object sender, EventArgs e)
+            {
+                if (sender is not Label owner)
+                    return;
+                toolTip.RemoveAll();
+                owner.Cursor = Cursors.Default;
+            }
+
+            void LocalLabelClick(object sender, EventArgs e)
+            {
+                if (sender is not Label owner)
+                    return;
+                var newBgImg = OpenImageFileDialog();
+                if (newBgImg == null)
+                    return;
+                owner.BackgroundImage = ValidateImageSize(newBgImg, owner.Size);
+            }
         }
 
         private Image OpenImageFileDialog()
@@ -221,16 +230,19 @@
                 extensions.Add(imageEncoders[i].FilenameExtension.ToLower());
                 var description = imageEncoders[i].CodecName.Substring(8).Replace("Codec", "Files").Trim();
                 var pattern = extensions[extensions.Count - 1];
-                dialog.Filter = string.Format(@"{0}{1}{2} ({3})|{3}", dialog.Filter, i > 0 ? "|" : string.Empty, description, pattern);
+                dialog.Filter = $@"{dialog.Filter}{(i > 0 ? "|" : string.Empty)}{description} ({pattern})|{pattern}";
             }
-            dialog.Filter = string.Format(@"{0}|Image Files ({1})|{1}", dialog.Filter, extensions.Join(";"));
-            dialog.FilterIndex = imageEncoders.Length + 1;
+            extensions.Add("*.webp");
+            dialog.Filter = $@"{dialog.Filter}{"|"}{"WebP Files"} ({"*.webp"})|{"*.webp"}";
+            dialog.Filter = $@"{dialog.Filter}|Image Files ({extensions.Join(";")})|{extensions.Join(";")}";
+            dialog.FilterIndex = extensions.Count + 1;
             if (dialog.ShowDialog(this) != DialogResult.OK)
                 return default;
+            var selectedFile = dialog.FileName;
             try
             {
-                var bmp = new Bitmap(dialog.FileName);
-                _fileName = Path.GetFileNameWithoutExtension(dialog.FileName);
+                var bmp = LoadImageFromPath(selectedFile);
+                _fileName = Path.GetFileNameWithoutExtension(selectedFile);
                 return bmp;
             }
             catch (Exception ex) when (ex.IsCaught())
