@@ -335,10 +335,10 @@ public partial class MainForm : Form
             }
 
             var fileName = Path.GetFileNameWithoutExtension(file);
-            var outPath = PathEx.Combine(outDir, fileName + ".ico");
+            var outPath = Path.Combine(outDir, fileName + ".ico");
 
             if (FileEx.Exists(outPath))
-                outPath = PathEx.Combine(outDir, $"{fileName}___{DateTime.Now:yyyyMMddHHmmssfff}.ico");
+                outPath = Path.Combine(outDir, $"{fileName}___{DateTime.Now:yyyyMMddHHmmssfff}.ico");
 
             Console.WriteLine("Creating images . . .");
             var images = GetImages(image);
