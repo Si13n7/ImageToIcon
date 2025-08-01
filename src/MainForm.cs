@@ -307,8 +307,13 @@ public partial class MainForm : Form
         var outDir = outArg.Substring(outArg.IndexOf('=') + 1).Trim('"');
         if (!Directory.Exists(outDir))
         {
-            Console.WriteLine($"Error: Output path '{outDir}' does not exist.");
-            return true;
+            var envDir = PathEx.Combine(outDir);
+            if (!Directory.Exists(envDir))
+            { 
+                Console.WriteLine($"Error: Output path '{outDir}' does not exist.");
+                return true;
+            }
+            outDir = envDir;
         }
 
         var files = args.Where(IsImageFile);
