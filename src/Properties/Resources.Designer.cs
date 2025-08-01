@@ -61,6 +61,26 @@ namespace ImageToIcon.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 
+        ///
+        ///Converts images to icons.
+        ///
+        ///Usage:
+        ///
+        ///{0} --cli --o=OutputPath [file1 file2 ...]
+        ///
+        ///  --cli or /cli           Run in command-line mode (no GUI).
+        ///  --o=PATH or /o=PATH     Output directory for generated .ico files.
+        ///  [fileX]                 List of image file paths to process.
+        ///.
+        /// </summary>
+        internal static string CliHelp {
+            get {
+                return ResourceManager.GetString("CliHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Symbol {
