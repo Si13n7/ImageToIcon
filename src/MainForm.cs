@@ -52,7 +52,9 @@ public partial class MainForm : Form
         return;
 
         static int LocalGetDpiDimension(int i, float dpi, bool upscale = false) =>
-            (int)Math.Round(i / (upscale ? dpi * 96f - dpi : dpi * 96f + dpi) / 1.5f);
+            upscale
+                ? (int)Math.Round(i / 96f * dpi - dpi / 1.5f)
+                : (int)Math.Round(i / dpi * 96f + dpi / 1.5f);
     }
 
     private static Image LoadImageFromPath(string path)
