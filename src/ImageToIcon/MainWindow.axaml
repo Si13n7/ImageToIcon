@@ -1,0 +1,110 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:m="using:ImageToIcon.Models"
+        mc:Ignorable="d"
+        x:Class="ImageToIcon.MainWindow"
+        Title="Image To Icon"
+        SizeToContent="WidthAndHeight"
+        CanResize="False"
+        Icon="/Assets/ProgramIcon.ico"
+        Background="{DynamicResource AppWindowBrush}"
+        Foreground="{DynamicResource AppTextBrush}"
+        DragDrop.AllowDrop="True">
+
+    <Window.Styles>
+        <Style Selector="ToggleButton.pill">
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Padding" Value="9,3" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppControlBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{DynamicResource AppSubTextBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="ToggleButton.pill:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AppHoverBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppThumbBorderBrush}" />
+        </Style>
+        <Style Selector="ToggleButton.pill:checked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AppThumbBorderBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppThumbBorderBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="ToggleButton.pill:checked:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AppThumbBorderBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppThumbBorderBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,Auto">
+
+        <Border Grid.Row="0" Padding="8" Background="{DynamicResource AppCategoryBrush}">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <ItemsControl x:Name="ImgPanel">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="m:IconThumb">
+                            <StackPanel Margin="2" Spacing="2"
+                                        ToolTip.Tip="{Binding TooltipText}"
+                                        Cursor="Hand"
+                                        Tag="{Binding}"
+                                        Background="Transparent"
+                                        PointerPressed="Thumb_PointerPressed"
+                                        DragDrop.AllowDrop="True">
+                                <Grid Width="{Binding DisplaySize}" Height="{Binding DisplaySize}">
+                                    <Image Source="{Binding Preview}" Stretch="Fill" />
+                                    <Rectangle Stroke="{DynamicResource AppThumbBorderBrush}"
+                                               StrokeThickness="1"
+                                               StrokeDashArray="2,2"
+                                               IsHitTestVisible="False" />
+                                </Grid>
+                                <TextBlock Text="{Binding SizeLabel}"
+                                           Foreground="{DynamicResource AppThumbBorderBrush}"
+                                           FontFamily="Calibri" FontWeight="Bold" FontSize="10"
+                                           HorizontalAlignment="Right"
+                                           IsHitTestVisible="False" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center"
+                    Spacing="12" Margin="8,14">
+            <ItemsControl x:Name="SizeToggles" HorizontalAlignment="Center">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="4" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="m:SizeToggle">
+                        <ToggleButton Classes="pill"
+                                      Content="{Binding Label}"
+                                      IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                      IsVisible="{Binding IsAvailable}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                <Button x:Name="OpenBtn" Content="Open Image" Width="120"
+                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+                <Button x:Name="SaveBtn" Content="Save Icon" Width="120"
+                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+            </StackPanel>
+        </StackPanel>
+
+    </Grid>
+</Window>

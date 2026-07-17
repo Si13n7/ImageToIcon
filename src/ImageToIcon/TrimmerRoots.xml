@@ -1,0 +1,10 @@
+<linker>
+    <assembly fullname="Avalonia" preserve="all"/>
+    <assembly fullname="Avalonia.Base" preserve="all"/>
+    <assembly fullname="Avalonia.Controls" preserve="all"/>
+    <assembly fullname="Avalonia.Desktop" preserve="all"/>
+    <assembly fullname="Avalonia.Themes.Fluent" preserve="all"/>
+    <assembly fullname="Avalonia.Fonts.Inter" preserve="all"/>
+    <assembly fullname="SixLabors.ImageSharp" preserve="all"/>
+    <assembly fullname="ImageToIcon" preserve="all"/>
+</linker>

@@ -1,0 +1,93 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ImageToIcon.App"
+             RequestedThemeVariant="Default">
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="AppAccentBrush" Color="#1E88E5" />
+                    <SolidColorBrush x:Key="AppCategoryBrush" Color="#E4E4EA" />
+                    <SolidColorBrush x:Key="AppControlBorderBrush" Color="#9898A8" />
+                    <SolidColorBrush x:Key="AppDangerBrush" Color="#C43535" />
+                    <SolidColorBrush x:Key="AppHoverBrush" Color="#E2EAF8" />
+                    <SolidColorBrush x:Key="AppSeparatorBrush" Color="#CCCCD4" />
+                    <SolidColorBrush x:Key="AppSubTextBrush" Color="#444458" />
+                    <SolidColorBrush x:Key="AppTextBrush" Color="#111111" />
+                    <SolidColorBrush x:Key="AppThumbBorderBrush" Color="#1E88E5" />
+                    <SolidColorBrush x:Key="AppWindowBrush" Color="#F5F5F7" />
+                    <SolidColorBrush x:Key="ButtonBackground" Color="#DADADF" />
+                    <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#E2EAF8" />
+                    <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#CCCCD4" />
+                    <SolidColorBrush x:Key="ButtonBorderBrush" Color="#9898A8" />
+                    <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#9898A8" />
+                    <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#9898A8" />
+                    <SolidColorBrush x:Key="ButtonForeground" Color="#111111" />
+                    <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#111111" />
+                    <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#111111" />
+                    <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPointerOver" Color="#E2EAF8" />
+                    <SolidColorBrush x:Key="MenuFlyoutItemForeground" Color="#111111" />
+                    <SolidColorBrush x:Key="MenuFlyoutItemForegroundPointerOver" Color="#111111" />
+                    <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#F5F5F7" />
+                    <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#CCCCD4" />
+                    <SolidColorBrush x:Key="ScrollBarButtonArrowForeground" Color="#9898A8" />
+                    <SolidColorBrush x:Key="ScrollBarButtonArrowForegroundPointerOver" Color="#111111" />
+                    <SolidColorBrush x:Key="ScrollBarButtonBackgroundPointerOver" Color="#E2EAF8" />
+                    <SolidColorBrush x:Key="ScrollBarPanningThumbBackground" Color="#9898A8" />
+                    <SolidColorBrush x:Key="ScrollBarThumbBackgroundColor" Color="#9898A8" />
+                    <SolidColorBrush x:Key="ScrollBarThumbFillPointerOver" Color="#444458" />
+                    <SolidColorBrush x:Key="ScrollBarThumbFillPressed" Color="#111111" />
+                    <SolidColorBrush x:Key="ScrollBarTrackFillPointerOver" Color="#DADADF" />
+                    <SolidColorBrush x:Key="SystemControlHighlightAltBaseHighBrush" Color="#111111" />
+                    <SolidColorBrush x:Key="SystemControlHighlightListLowBrush" Color="#E2EAF8" />
+                    <SolidColorBrush x:Key="SystemControlHighlightListMediumBrush" Color="#E2EAF8" />
+                </ResourceDictionary>
+
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="AppAccentBrush" Color="#4FC3F7" />
+                    <SolidColorBrush x:Key="AppCategoryBrush" Color="#2C2C2C" />
+                    <SolidColorBrush x:Key="AppControlBorderBrush" Color="#484850" />
+                    <SolidColorBrush x:Key="AppDangerBrush" Color="#F06060" />
+                    <SolidColorBrush x:Key="AppHoverBrush" Color="#2A2A2A" />
+                    <SolidColorBrush x:Key="AppSeparatorBrush" Color="#383838" />
+                    <SolidColorBrush x:Key="AppSubTextBrush" Color="#888888" />
+                    <SolidColorBrush x:Key="AppTextBrush" Color="#DCDCDC" />
+                    <SolidColorBrush x:Key="AppThumbBorderBrush" Color="#4FC3F7" />
+                    <SolidColorBrush x:Key="AppWindowBrush" Color="#1D2122" />
+                    <SolidColorBrush x:Key="ButtonBackground" Color="#272727" />
+                    <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#2A2A2A" />
+                    <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#383838" />
+                    <SolidColorBrush x:Key="ButtonBorderBrush" Color="#484850" />
+                    <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#484850" />
+                    <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#484850" />
+                    <SolidColorBrush x:Key="ButtonForeground" Color="#DCDCDC" />
+                    <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#DCDCDC" />
+                    <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#DCDCDC" />
+                    <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPointerOver" Color="#2A2A2A" />
+                    <SolidColorBrush x:Key="MenuFlyoutItemForeground" Color="#DCDCDC" />
+                    <SolidColorBrush x:Key="MenuFlyoutItemForegroundPointerOver" Color="#DCDCDC" />
+                    <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#1D2122" />
+                    <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#383838" />
+                    <SolidColorBrush x:Key="ScrollBarButtonArrowForeground" Color="#484850" />
+                    <SolidColorBrush x:Key="ScrollBarButtonArrowForegroundPointerOver" Color="#DCDCDC" />
+                    <SolidColorBrush x:Key="ScrollBarButtonBackgroundPointerOver" Color="#2A2A2A" />
+                    <SolidColorBrush x:Key="ScrollBarPanningThumbBackground" Color="#484850" />
+                    <SolidColorBrush x:Key="ScrollBarThumbBackgroundColor" Color="#484850" />
+                    <SolidColorBrush x:Key="ScrollBarThumbFillPointerOver" Color="#888888" />
+                    <SolidColorBrush x:Key="ScrollBarThumbFillPressed" Color="#DCDCDC" />
+                    <SolidColorBrush x:Key="ScrollBarTrackFillPointerOver" Color="#272727" />
+                    <SolidColorBrush x:Key="SystemControlHighlightAltBaseHighBrush" Color="#DCDCDC" />
+                    <SolidColorBrush x:Key="SystemControlHighlightListLowBrush" Color="#2A2A2A" />
+                    <SolidColorBrush x:Key="SystemControlHighlightListMediumBrush" Color="#2A2A2A" />
+                </ResourceDictionary>
+
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
+</Application>

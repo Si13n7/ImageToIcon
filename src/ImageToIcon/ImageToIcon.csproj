@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <ApplicationIcon>Assets/ProgramIcon.ico</ApplicationIcon>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <SelfContained>true</SelfContained>
+        <PublishSingleFile>true</PublishSingleFile>
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+        <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+        <PublishTrimmed>true</PublishTrimmed>
+        <AssemblyTitle>ImageToIcon</AssemblyTitle>
+        <Product>ImageToIcon</Product>
+        <Description>Convert images to multi-size Windows .ico files, cross-platform</Description>
+        <Company>Roy Bock</Company>
+        <Copyright>Copyright © Roy Bock $([System.DateTime]::Now.ToString('yyyy'))</Copyright>
+        <_VersionRevision Condition="'$(Configuration)' == 'Release'">0</_VersionRevision>
+        <_VersionRevision Condition="'$(Configuration)' != 'Release'">$([System.DateTime]::Now.ToString('HHmm'))</_VersionRevision>
+        <Version>$([System.DateTime]::Now.ToString('yy.M.d')).$(_VersionRevision)</Version>
+        <AssemblyVersion>$(Version)</AssemblyVersion>
+        <FileVersion>$(Version)</FileVersion>
+        <TrimmerRootDescriptor>TrimmerRoots.xml</TrimmerRootDescriptor>
+        <NoWarn>$(NoWarn);IL2104;IL2026</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AvaloniaResource Include="Assets/**"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="12.1.0"/>
+        <PackageReference Include="Avalonia.Desktop" Version="12.1.0"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.0"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.0"/>
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+        <PackageReference Include="Tmds.DBus.Protocol" Version="0.94.2"/>
+    </ItemGroup>
+
+</Project>
