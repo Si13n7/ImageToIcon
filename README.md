@@ -1,31 +1,102 @@
-<p align="center"><a href="https://github.com/Si13n7/ImageToIcon/releases/latest"><img src="https://img.shields.io/github/tag/Si13n7/ImageToIcon.svg?style=flat&label=release&logoWidth=14&logo=windows" alt="release"></a> &nbsp; <a href="https://www.microsoft.com/download/details.aspx?id=55170"><img src="https://img.shields.io/badge/platform->=%20v4.8.1-lightgrey.svg?style=flat&logo=.net&logoColor=white" alt="platform"></a> &nbsp; <a href="https://github.com/Si13n7/ImageToIcon/blob/master/LICENSE.txt"><img src="https://img.shields.io/github/license/Si13n7/ImageToIcon.svg?style=flat" alt="license"></a></p>
-<p align="center"><a href="https://github.com/Si13n7/ImageToIcon/commits/master"><img src="https://img.shields.io/github/last-commit/Si13n7/ImageToIcon.svg?style=flat&logo=github&logoColor=white" alt="last-commit"></a> &nbsp; <a href="https://github.com/Si13n7/ImageToIcon/commits/master"><img src="https://img.shields.io/github/commits-since/Si13n7/ImageToIcon/latest.svg?style=flat&logo=github&logoColor=white" alt="commits-since"></a> &nbsp; <a href="https://github.com/Si13n7/ImageToIcon/issues"><img src="https://img.shields.io/github/issues/Si13n7/ImageToIcon.svg?style=flat&logo=github&logoColor=white" alt="issues-open"></a> &nbsp; <a href="https://github.com/Si13n7/ImageToIcon/issues?q=is%3Aissue+is%3Aclosed"><img src="https://img.shields.io/github/issues-closed/Si13n7/ImageToIcon.svg?style=flat&logo=github&logoColor=white" alt="issues-closed"></a></p>
-<p align="center"><a href="https://dl.si13n7.de"><img src="https://img.shields.io/website/https/dl.si13n7.de.svg?style=flat&down_color=red&down_message=offline&up_color=limegreen&up_message=online&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEwSURBVDhPxZJNSgNBEIXnCp5AcCO4CmaTRRaKBhdCFkGCCKLgz2Y2RiQgCiqZzmi3CG4COj0X8ApewSt4Ba%2FQ9leZGpyVG8GComtq3qv3qmeS%2Fw9nikHMd5sVn3bqLx7zom1NcW8z%2F6G9CjoPm722rPEv45EJ21vD0O30AvX12IWDvTRsrPXrnjPlUYO0u3McVpZXhch5cnguZ7vVDWfpjRAZgPqc%2BIMEgKQe9Pfr0xn%2FBqZJjAUNQKilp5cC1gHYYz8Usc3OQsTz9HZWK5BMJwFDwrbWbuIXhfhg%2FDpWuE2mK5lEgQtiz4baU14u3V09i5peiipy6qVAxFWtZiflJiq8AAiIZx1CnxpStGmEpEHDZf4r2pUd%2BMjYxomoxJofo4L%2FHqyR57OF6vEvIkm%2BAYRc%2BWd4P97CAAAAAElFTkSuQmCC" alt="website"></a> &nbsp; <a href="https://dl.si13n7.com"><img src="https://img.shields.io/website/https/dl.si13n7.com.svg?style=flat&down_color=red&down_message=offline&label=mirror&up_color=limegreen&up_message=online&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEwSURBVDhPxZJNSgNBEIXnCp5AcCO4CmaTRRaKBhdCFkGCCKLgz2Y2RiQgCiqZzmi3CG4COj0X8ApewSt4Ba%2FQ9leZGpyVG8GComtq3qv3qmeS%2Fw9nikHMd5sVn3bqLx7zom1NcW8z%2F6G9CjoPm722rPEv45EJ21vD0O30AvX12IWDvTRsrPXrnjPlUYO0u3McVpZXhch5cnguZ7vVDWfpjRAZgPqc%2BIMEgKQe9Pfr0xn%2FBqZJjAUNQKilp5cC1gHYYz8Usc3OQsTz9HZWK5BMJwFDwrbWbuIXhfhg%2FDpWuE2mK5lEgQtiz4baU14u3V09i5peiipy6qVAxFWtZiflJiq8AAiIZx1CnxpStGmEpEHDZf4r2pUd%2BMjYxomoxJofo4L%2FHqyR57OF6vEvIkm%2BAYRc%2BWd4P97CAAAAAElFTkSuQmCC" alt="mirror"></a></p>
+# ImageToIcon
 
-### Preview (light / dark)
+<p align="center">
+<a href="https://dotnet.microsoft.com/download"><img src="https://img.shields.io/badge/.NET-10-512BD4?style=for-the-badge&logoColor=white" title=".NET 10 or higher" alt=".NET"></a>
+<a href="https://learn.microsoft.com/dotnet/csharp/"><img src="https://img.shields.io/badge/language-C%23-239120?style=for-the-badge&logo=csharp&logoColor=white" title="Written in C#" alt="C#"></a>
+<a href="https://avaloniaui.net/"><img src="https://img.shields.io/badge/UI-Avalonia-8B5CF6?style=for-the-badge&logoColor=white" title="Built with Avalonia UI" alt="Avalonia"></a>
+<a href="https://distrochooser.de/"><img src="https://img.shields.io/badge/cross%E2%80%93platform-Linux%2BWindows-blue?style=for-the-badge&logo=linux&logoColor=silver" title="Runs on Linux and Windows" alt="Platform"></a>
+<a href="LICENSE.txt"><img src="https://img.shields.io/github/license/Si13n7/ImageToIcon?style=for-the-badge" title="Read the license terms" alt="License"></a>
+</p>
+<p align="center">
+<a href="../../issues"><img src="https://img.shields.io/github/issues/Si13n7/ImageToIcon?logo=github&logoColor=silver&style=for-the-badge" title="Browse open issues" alt="Open Issues"></a>
+<a href="../../commits/master"><img src="https://img.shields.io/github/last-commit/Si13n7/ImageToIcon?logo=github&logoColor=silver&style=for-the-badge" title="Check the last commits" alt="Last Commit"></a>
+<a href="../../releases/latest"><img src="https://img.shields.io/github/v/release/Si13n7/ImageToIcon?logo=github&logoColor=silver&style=for-the-badge" title="Check the latest release" alt="Release"></a>
+</p>
+
+**ImageToIcon** is a small cross-platform tool for turning any image into a multi-size Windows `.ico` file. Drop in a single picture and it generates all the standard icon sizes at once, with clean Lanczos downscaling — no wizard, no upsell, no bundle of proprietary editors.
+
+> Every icon workflow used to mean juggling three tools: one to resize, one to compose, one to export. ImageToIcon collapses that into one window and one save button.
+
+---
+
+## Preview (light / dark)
 <p align="center"><img src="https://github.com/Si13n7/ImageToIcon/assets/6128966/6bd52856-a5ed-4de5-9c6e-9d7f919fb70d"></p>
 
 <p align="center"><img src="https://github.com/Si13n7/ImageToIcon/assets/6128966/a046122c-639c-4960-8eae-21589fc57bd6"></p>
 
-### Description
+---
 
-I'm tired of using multiple tools to create a single icon with multiple image sizes inside. I found some similar tools, but not for free. So I just created my own.
+## Features
 
-I needed a tool that loads a single image and depending on the size it creates all the lower sizes with the best possible quality. It's also possible to manually change each image for all sizes before saving, the size will be adjusted automatically.
+- Runs natively on Linux and Windows — same binary logic, same output
+- Load any common raster format: PNG, JPEG, BMP, TIFF, GIF, WebP, TGA, QOI, PBM/PGM/PPM/PNM
+- Automatic generation of every standard Windows icon size from 8&nbsp;px up to 512&nbsp;px
+- Toggle individual sizes on or off before saving — the default preset matches the classic Windows application icon set (256, 128, 64, 48, 32, 24, 16)
+- High-quality Lanczos-3 resampling for sharp results at every size
+- Replace individual sizes manually — swap in a hand-tuned image for 16&nbsp;px or 32&nbsp;px and it gets resized in place to fit the slot
+- Drag-and-drop support on the main window and on individual thumbnails
+- CLI mode for batch conversion and scripting — process a folder of images in one call
+- PNG-compressed frames inside the ICO container for smaller files, especially at 256&nbsp;px and up
 
-### Requirements:
-- Microsoft Windows 7 or higher
-- [Microsoft .NET Framework Version 4.8.1+](https://www.microsoft.com/download/details.aspx?id=55170)
+---
 
-### Requirements (Developer):
-- [Microsoft Windows 11](https://www.microsoft.com/software-download/windows10)
-   - _Microsoft Windows 7, 8, 8.1 and 10 should work well, but is no longer tested_
-- [Microsoft Visual Studio 2019 + .NET Framework 4.7.2 SDK](https://www.visualstudio.com/downloads/)
-- [Si13n7 Dev.™ CSharp Library Binaries](https://github.com/Si13n7/SilDev.CSharpLib/)
+## Download
 
-## Would you like to help?
+The latest release is available on the [Releases](https://github.com/Si13n7/ImageToIcon/releases/latest) page — no installation required, just extract and run the executable — *ImageToIcon.exe* on Windows, *ImageToIcon* on Linux.
 
-- [Star this Project](https://github.com/Si13n7/ImageToIcon/stargazers) :star: and show me that this project interests you :hugs:
-- [Open an Issue](https://github.com/Si13n7/ImageToIcon/issues/new) :coffee: to give me your feedback and tell me your ideas and wishes for the future :sunglasses:
-- [Open a Ticket](https://support.si13n7.de/) :mailbox: if you don't have a GitHub account, you can contact me directly on my website :wink:
-- [Donate by PayPal](http://donate.si13n7.com/) :money_with_wings: to buy me some cookies :cookie:
+---
+
+## Command Line
+
+ImageToIcon also runs headless. Any invocation containing `--cli` (or `/cli`) skips the UI and processes files directly:
+
+```bash
+ImageToIcon --cli --o=./out image1.png image2.jpg
+ImageToIcon --cli --o=./out --sizes=16,32,48,256 logo.png
+ImageToIcon --cli --o=./out --sizes=all logo.png
+```
+
+| Option | Description |
+| --- | --- |
+| `--cli`, `/cli` | Run in CLI mode. |
+| `--o=DIR`, `/o=DIR` | Output directory for the generated `.ico` files. |
+| `--sizes=<list>` | Comma-separated list of icon sizes to generate. |
+| `--sizes=all` | Generate every supported size. |
+| `--help`, `/?` | Show usage information. |
+
+---
+
+## Requirements
+
+### Linux
+- Any modern x64 Linux distribution
+- No .NET runtime required — ships as a self-contained single-file executable
+
+### Windows
+- Windows 10 or later (x64)
+- No additional dependencies — ships as a self-contained single-file executable
+
+---
+
+## Building from Source
+
+### Prerequisites
+
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+
+### Build
+
+```bash
+# Debug build (default, linux-x64 only)
+./build.sh
+
+# Release build (linux-x64 and win-x64)
+./build.sh Release
+```
+
+### Run directly (without full build)
+
+```bash
+cd src/ImageToIcon
+dotnet run
+```
