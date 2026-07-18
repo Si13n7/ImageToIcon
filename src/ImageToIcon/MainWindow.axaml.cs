@@ -23,7 +23,11 @@ public partial class MainWindow : Window
     private Image<Rgba32>? _sourceImage;
     private string? _sourceName;
 
-    public MainWindow(string? startupFile = null)
+    public MainWindow() : this(null)
+    {
+    }
+
+    public MainWindow(string? startupFile)
     {
         InitializeComponent();
 
