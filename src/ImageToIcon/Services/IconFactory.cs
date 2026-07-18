@@ -21,10 +21,10 @@ public static class IconFactory
         512, 256, 128, 96, 64, 48, 40, 32, 24, 22, 20, 16, 14, 10, 8
     ];
 
-    /// Sizes checked by default (classic Windows application icon set).
+    /// Sizes checked by default (Windows 11 application icon set).
     public static readonly IReadOnlyList<int> DefaultSizes =
     [
-        256, 128, 64, 48, 32, 24, 16
+        256, 64, 48, 40, 32, 24, 20, 16
     ];
 
     public static IEnumerable<Image<Rgba32>> BuildSizes(Image<Rgba32> source, IEnumerable<int> sizes)
