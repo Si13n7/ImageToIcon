@@ -38,6 +38,7 @@ public partial class MainWindow : Window
 
         var openBtn = this.FindControl<Button>("OpenBtn")!;
         var saveBtn = this.FindControl<Button>("SaveBtn")!;
+        var addSizeBtn = this.FindControl<Button>("AddSizeBtn")!;
         var panel = this.FindControl<ItemsControl>("ImgPanel")!;
         var toggles = this.FindControl<ItemsControl>("SizeToggles")!;
 
@@ -45,15 +46,20 @@ public partial class MainWindow : Window
         toggles.ItemsSource = _sizeToggles;
 
         var selected = new HashSet<int>(settings.SelectedSizes);
-        foreach (var size in IconFactory.AllSizes)
+        var defaults = new HashSet<int>(IconFactory.DefaultSizes);
+        var union = new SortedSet<int>(Comparer<int>.Create((a, b) => b.CompareTo(a)));
+        foreach (var s in IconFactory.DefaultSizes) union.Add(s);
+        foreach (var s in settings.CustomSizes) union.Add(s);
+        foreach (var size in union)
         {
-            var toggle = new SizeToggle(size, selected.Contains(size));
+            var toggle = new SizeToggle(size, selected.Contains(size), !defaults.Contains(size));
             toggle.PropertyChanged += Toggle_PropertyChanged;
             _sizeToggles.Add(toggle);
         }
 
         openBtn.Click += async (_, _) => await OpenImageAsync();
         saveBtn.Click += async (_, _) => await SaveIconAsync();
+        addSizeBtn.Click += async (_, _) => await AddCustomSizeAsync();
 
         AddHandler(DragDrop.DropEvent, OnWindowDrop);
         AddHandler(DragDrop.DragOverEvent, OnWindowDragOver);
@@ -61,6 +67,7 @@ public partial class MainWindow : Window
         Closing += (_, _) =>
         {
             settings.SelectedSizes = _sizeToggles.Where(t => t.IsChecked).Select(t => t.Size).ToArray();
+            settings.CustomSizes = _sizeToggles.Where(t => t.IsCustom).Select(t => t.Size).ToArray();
             settings.Save();
             _sourceImage?.Dispose();
         };
@@ -239,6 +246,73 @@ public partial class MainWindow : Window
         }
 
         return null;
+    }
+
+    private void InsertSorted(SizeToggle t)
+    {
+        var i = 0;
+        while (i < _sizeToggles.Count && _sizeToggles[i].Size > t.Size) i++;
+        _sizeToggles.Insert(i, t);
+    }
+
+    private void ApplyAvailabilityTo(SizeToggle t)
+    {
+        if (_sourceImage == null) return;
+        var maxDim = Math.Max(_sourceImage.Width, _sourceImage.Height);
+        t.IsAvailable = t.Size <= maxDim;
+    }
+
+    private async Task AddCustomSizeAsync()
+    {
+        var used = new HashSet<int>(_sizeToggles.Select(t => t.Size));
+        var newSize = await SizeInputDialog.ShowAsync(this, null, used);
+        if (newSize == null) return;
+        var toggle = new SizeToggle(newSize.Value, true, true);
+        toggle.PropertyChanged += Toggle_PropertyChanged;
+        InsertSorted(toggle);
+        ApplyAvailabilityTo(toggle);
+        RebuildThumbs();
+    }
+
+    private async Task EditCustomSizeAsync(SizeToggle t)
+    {
+        var used = new HashSet<int>(_sizeToggles.Where(x => x != t).Select(x => x.Size));
+        var newSize = await SizeInputDialog.ShowAsync(this, t.Size, used);
+        if (newSize == null || newSize == t.Size) return;
+        var wasChecked = t.IsChecked;
+        t.PropertyChanged -= Toggle_PropertyChanged;
+        _sizeToggles.Remove(t);
+        var nt = new SizeToggle(newSize.Value, wasChecked, true);
+        nt.PropertyChanged += Toggle_PropertyChanged;
+        InsertSorted(nt);
+        ApplyAvailabilityTo(nt);
+        RebuildThumbs();
+    }
+
+    private void RemoveCustomSize(SizeToggle t)
+    {
+        t.PropertyChanged -= Toggle_PropertyChanged;
+        _sizeToggles.Remove(t);
+        RebuildThumbs();
+    }
+
+    private void Pill_ContextRequested(object? sender, ContextRequestedEventArgs e)
+    {
+        if (sender is not Control { DataContext: SizeToggle { IsCustom: true } t } ctrl)
+        {
+            e.Handled = true;
+            return;
+        }
+
+        var menu = new ContextMenu();
+        var edit = new MenuItem { Header = "Edit..." };
+        edit.Click += async (_, _) => await EditCustomSizeAsync(t);
+        var remove = new MenuItem { Header = "Remove" };
+        remove.Click += (_, _) => RemoveCustomSize(t);
+        menu.Items.Add(edit);
+        menu.Items.Add(remove);
+        menu.Open(ctrl);
+        e.Handled = true;
     }
 
     private async void Thumb_PointerPressed(object? sender, PointerPressedEventArgs e)

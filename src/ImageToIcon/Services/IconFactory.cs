@@ -9,17 +9,11 @@ namespace ImageToIcon.Services;
 /// Cross-platform ICO writer. Ported from SilDev.Drawing.IconFactory, converted to ImageSharp.
 public static class IconFactory
 {
-    private const int MaxSize = 512;
-    private const int MinSize = 2;
+    public const int MaxSize = 4096;
+    public const int MinSize = 2;
 
     private const int SizeIconDir = 6;
     private const int SizeIconDirEntry = 16;
-
-    /// All icon sizes the writer can produce, ordered from largest to smallest.
-    public static readonly IReadOnlyList<int> AllSizes =
-    [
-        512, 256, 128, 96, 64, 48, 40, 32, 24, 22, 20, 16, 14, 10, 8
-    ];
 
     /// Sizes checked by default (Windows 11 application icon set).
     public static readonly IReadOnlyList<int> DefaultSizes =
@@ -52,7 +46,7 @@ public static class IconFactory
     private static void Save(IEnumerable<Image<Rgba32>> images, Stream stream)
     {
         var list = images
-                   .Where(i => i.Width >= MinSize && i.Height >= MinSize && i.Width <= MaxSize && i.Height <= MaxSize)
+                   .Where(i => i is { Width: >= MinSize and <= MaxSize, Height: >= MinSize and <= MaxSize })
                    .OrderByDescending(i => i.Width)
                    .ThenByDescending(i => i.Height)
                    .ToArray();

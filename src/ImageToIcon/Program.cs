@@ -99,11 +99,9 @@ public static class Program
         var arg = args.FirstOrDefault(a => a.StartsWith("--sizes=") || a.StartsWith("/sizes="));
         if (arg == null) return null;
         var raw = arg[(arg.IndexOf('=') + 1)..].Trim('"');
-        if (raw.Equals("all", StringComparison.OrdinalIgnoreCase))
-            return IconFactory.AllSizes.ToArray();
         var parsed = raw.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                         .Select(s => int.TryParse(s, out var n) ? n : -1)
-                        .Where(n => IconFactory.AllSizes.Contains(n))
+                        .Where(n => n is >= IconFactory.MinSize and <= IconFactory.MaxSize)
                         .Distinct()
                         .ToArray();
         return parsed.Length > 0 ? parsed : null;
@@ -113,16 +111,15 @@ public static class Program
     {
         var name = Environment.ProcessPath is { } p ? Path.GetFileNameWithoutExtension(p) : "ImageToIcon";
         Console.WriteLine($"""
-                           Usage: {name} [--cli] --o=<output-dir> [--sizes=<list>|all] <image1> [image2 ...]
+                           Usage: {name} [--cli] --o=<output-dir> [--sizes=<list>] <image1> [image2 ...]
 
                              --cli, /cli           Run in CLI mode.
                              --o=DIR, /o=DIR       Output directory for .ico files.
                              --sizes=16,32,64      Comma-separated list of icon sizes to generate.
-                             --sizes=all           Generate every supported size.
                              --help, /?            Show this help.
 
                            Default sizes:    {string.Join(", ", IconFactory.DefaultSizes)}
-                           Available sizes:  {string.Join(", ", IconFactory.AllSizes)}
+                           Size range:       {IconFactory.MinSize}–{IconFactory.MaxSize}
                            Supported input:  {string.Join(", ", ImageLoader.SupportedExtensions)}
                            """);
     }

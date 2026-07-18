@@ -6,6 +6,7 @@ namespace ImageToIcon.Services;
 public class Settings
 {
     public int[] SelectedSizes { get; set; } = IconFactory.DefaultSizes.ToArray();
+    public int[] CustomSizes { get; set; } = [];
 
     private static string ConfigPath
     {

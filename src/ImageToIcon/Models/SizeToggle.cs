@@ -3,18 +3,13 @@ using System.Runtime.CompilerServices;
 
 namespace ImageToIcon.Models;
 
-public class SizeToggle : INotifyPropertyChanged
+public class SizeToggle(int size, bool isChecked, bool isCustom = false) : INotifyPropertyChanged
 {
     private bool _isAvailable = true;
-    private bool _isChecked;
+    private bool _isChecked = isChecked;
 
-    public SizeToggle(int size, bool isChecked)
-    {
-        Size = size;
-        _isChecked = isChecked;
-    }
-
-    public int Size { get; }
+    public int Size { get; } = size;
+    public bool IsCustom { get; } = isCustom;
     public string Label => Size.ToString();
 
     public bool IsChecked

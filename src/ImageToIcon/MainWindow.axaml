@@ -41,6 +41,26 @@
             <Setter Property="BorderBrush" Value="{DynamicResource AppThumbBorderBrush}" />
             <Setter Property="Foreground" Value="White" />
         </Style>
+        <Style Selector="ToggleButton.pill.unavailable">
+            <Setter Property="Opacity" Value="0.4" />
+        </Style>
+        <Style Selector="Button.pill">
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Padding" Value="9,3" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppControlBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{DynamicResource AppSubTextBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="Button.pill:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AppHoverBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppThumbBorderBrush}" />
+        </Style>
     </Window.Styles>
 
     <Grid RowDefinitions="Auto,Auto">
@@ -83,21 +103,26 @@
 
         <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center"
                     Spacing="12" Margin="8,14">
-            <ItemsControl x:Name="SizeToggles" HorizontalAlignment="Center">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" Spacing="4" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="m:SizeToggle">
-                        <ToggleButton Classes="pill"
-                                      Content="{Binding Label}"
-                                      IsChecked="{Binding IsChecked, Mode=TwoWay}"
-                                      IsVisible="{Binding IsAvailable}" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
+                <ItemsControl x:Name="SizeToggles">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="4" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="m:SizeToggle">
+                            <ToggleButton Classes="pill"
+                                          Classes.unavailable="{Binding !IsAvailable}"
+                                          Content="{Binding Label}"
+                                          IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                          ContextRequested="Pill_ContextRequested" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Button x:Name="AddSizeBtn" Classes="pill" Content="+"
+                        ToolTip.Tip="Add a custom size" />
+            </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
                 <Button x:Name="OpenBtn" Content="Open Image" Width="120"
                         HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
