@@ -27,14 +27,15 @@
 ## Features
 
 - Runs natively on Linux and Windows — same binary logic, same output
-- Load any common raster format: PNG, JPEG, BMP, TIFF, GIF, WebP, TGA, QOI, PBM/PGM/PPM/PNM
-- Automatic generation of every standard Windows icon size from 8&nbsp;px up to 512&nbsp;px
-- Toggle individual sizes on or off before saving — the default preset matches the classic Windows application icon set (256, 128, 64, 48, 32, 24, 16)
+- Load any common raster format: `PNG`, `JPG`, `BMP`, `TIF`, `GIF`, `WEBP`, `TGA`, `QOI`, `PBM`/`PGM`/`PPM`/`PNM`
+- Load `SVG` files directly (rasterised via Skia) and extract icon frames straight from `ICO`, `EXE` and `DLL` files
+- Default preset matches the current Windows 11 application icon set (256, 64, 48, 40, 32, 24, 20, 16)
+- Freely add, edit or remove custom sizes — any value from 2&nbsp;px up to 4096&nbsp;px, right-click a size to manage it
 - High-quality Lanczos-3 resampling for sharp results at every size
 - Replace individual sizes manually — swap in a hand-tuned image for 16&nbsp;px or 32&nbsp;px and it gets resized in place to fit the slot
 - Drag-and-drop support on the main window and on individual thumbnails
 - CLI mode for batch conversion and scripting — process a folder of images in one call
-- PNG-compressed frames inside the ICO container for smaller files, especially at 256&nbsp;px and up
+- `PNG`-compressed frames inside the `ICO` container for smaller files, especially at 256&nbsp;px and up
 
 ---
 
@@ -51,15 +52,13 @@ ImageToIcon also runs headless. Any invocation containing `--cli` (or `/cli`) sk
 ```bash
 ImageToIcon --cli --o=./out image1.png image2.jpg
 ImageToIcon --cli --o=./out --sizes=16,32,48,256 logo.png
-ImageToIcon --cli --o=./out --sizes=all logo.png
 ```
 
 | Option | Description |
 | --- | --- |
 | `--cli`, `/cli` | Run in CLI mode. |
 | `--o=DIR`, `/o=DIR` | Output directory for the generated `.ico` files. |
-| `--sizes=<list>` | Comma-separated list of icon sizes to generate. |
-| `--sizes=all` | Generate every supported size. |
+| `--sizes=<list>` | Comma-separated list of icon sizes to generate (2–4096). |
 | `--help`, `/?` | Show usage information. |
 
 ---
