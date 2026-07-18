@@ -30,7 +30,7 @@ public static class IconFactory
             var clone = source.Clone(ctx => ctx.Resize(new ResizeOptions
             {
                 Size = new Size(s, s),
-                Mode = ResizeMode.Stretch,
+                Mode = ResizeMode.Pad,
                 Sampler = KnownResamplers.Lanczos3
             }));
             yield return clone;

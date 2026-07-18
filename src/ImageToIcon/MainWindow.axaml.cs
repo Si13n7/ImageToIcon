@@ -155,7 +155,7 @@ public partial class MainWindow : Window
             var resized = _sourceImage.Clone(ctx => ctx.Resize(new ResizeOptions
             {
                 Size = new Size(size, size),
-                Mode = ResizeMode.Stretch,
+                Mode = ResizeMode.Pad,
                 Sampler = KnownResamplers.Lanczos3
             }));
             _thumbs.Add(new IconThumb(size, resized));
@@ -231,7 +231,7 @@ public partial class MainWindow : Window
             var resized = newImg.Clone(ctx => ctx.Resize(new ResizeOptions
             {
                 Size = new Size(thumb.Size, thumb.Size),
-                Mode = ResizeMode.Stretch,
+                Mode = ResizeMode.Pad,
                 Sampler = KnownResamplers.Lanczos3
             }));
             newImg.Dispose();
@@ -352,7 +352,7 @@ public partial class MainWindow : Window
             var resized = img.Clone(ctx => ctx.Resize(new ResizeOptions
             {
                 Size = new Size(thumb.Size, thumb.Size),
-                Mode = ResizeMode.Stretch,
+                Mode = ResizeMode.Pad,
                 Sampler = KnownResamplers.Lanczos3
             }));
             img.Dispose();
