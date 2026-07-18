@@ -20,9 +20,7 @@
 ---
 
 ## Preview (light / dark)
-<p align="center"><img src="https://github.com/Si13n7/ImageToIcon/assets/6128966/6bd52856-a5ed-4de5-9c6e-9d7f919fb70d"></p>
-
-<p align="center"><img src="https://github.com/Si13n7/ImageToIcon/assets/6128966/a046122c-639c-4960-8eae-21589fc57bd6"></p>
+<p align="center"><a href="media/"><img src="media/preview.png"></a></p>
 
 ---
 
