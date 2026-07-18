@@ -156,14 +156,7 @@ public partial class MainWindow : Window
         {
             Title = "Open image",
             AllowMultiple = false,
-            FileTypeFilter =
-            [
-                new FilePickerFileType("Image files")
-                {
-                    Patterns = ImageLoader.SupportedExtensions.Select(e => "*" + e).ToArray()
-                },
-                FilePickerFileTypes.All
-            ]
+            FileTypeFilter = ImageLoader.BuildFilePickerFilters()
         });
         var file = files.FirstOrDefault();
         if (file == null)
@@ -258,13 +251,7 @@ public partial class MainWindow : Window
             var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
                 AllowMultiple = false,
-                FileTypeFilter =
-                [
-                    new FilePickerFileType("Image files")
-                    {
-                        Patterns = ImageLoader.SupportedExtensions.Select(ext => "*" + ext).ToArray()
-                    }
-                ]
+                FileTypeFilter = ImageLoader.BuildFilePickerFilters()
             });
             var file = files.FirstOrDefault();
             if (file == null)

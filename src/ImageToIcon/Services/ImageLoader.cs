@@ -1,3 +1,4 @@
+using Avalonia.Platform.Storage;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -5,31 +6,57 @@ namespace ImageToIcon.Services;
 
 public static class ImageLoader
 {
+    public static readonly Dictionary<string, string[]> RasterCategories = new()
+    {
+        ["Bitmap Image"] = [".bmp", ".dib", ".rle"],
+        ["GIF Image"] = [".gif"],
+        ["JPEG Image"] = [".jpg", ".jpeg", ".jpe", ".jfif"],
+        ["PNG Image"] = [".png"],
+        ["Portable Anymap"] = [".pbm", ".pgm", ".ppm", ".pnm"],
+        ["Quite OK Image"] = [".qoi"],
+        ["Targa Image"] = [".tga"],
+        ["TIFF Image"] = [".tif", ".tiff"],
+        ["WebP Image"] = [".webp"]
+    };
+
+    public static readonly Dictionary<string, string[]> Categories =
+        RasterCategories.Concat(IconReader.Categories)
+                        .OrderBy(kv => kv.Key, StringComparer.OrdinalIgnoreCase)
+                        .ToDictionary(kv => kv.Key, kv => kv.Value);
+
     public static readonly string[] SupportedExtensions =
-    [
-        ".bmp", ".dib", ".rle",
-        ".jpg", ".jpeg", ".jpe", ".jfif",
-        ".tif", ".tiff",
-        ".png",
-        ".webp",
-        ".gif",
-        ".tga",
-        ".pbm", ".pgm", ".ppm", ".pnm",
-        ".qoi",
-        ".pbm", ".pgm", ".ppm", ".pnm",
-        ".qoi"
-    ];
+        Categories.Values.SelectMany(v => v).ToArray();
 
     public static bool IsSupported(string path)
     {
         return SupportedExtensions.Any(e => path.EndsWith(e, StringComparison.OrdinalIgnoreCase));
     }
 
+    /// Builds file picker filters: "All supported" first (preselected), then one entry per
+    /// category, and finally the OS "All files" option.
+    public static IReadOnlyList<FilePickerFileType> BuildFilePickerFilters()
+    {
+        var filters = new List<FilePickerFileType>
+        {
+            new("All supported")
+            {
+                Patterns = SupportedExtensions.Select(e => "*" + e).ToArray()
+            }
+        };
+        foreach (var (label, exts) in Categories)
+            filters.Add(new FilePickerFileType(label) { Patterns = exts.Select(e => "*" + e).ToArray() });
+        filters.Add(FilePickerFileTypes.All);
+        return filters;
+    }
+
     public static Image<Rgba32>? TryLoad(string path)
     {
         try
         {
-            return File.Exists(path) ? Image.Load<Rgba32>(path) : null;
+            if (!File.Exists(path)) return null;
+            if (IconReader.IsSupported(path))
+                return IconReader.TryLoad(path);
+            return Image.Load<Rgba32>(path);
         }
         catch
         {
