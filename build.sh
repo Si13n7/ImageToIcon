@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Builds ImageToIcon into bin/<configuration>/.
-# Debug: linux-x64 only. Release: linux-x64 and win-x64 share the same output directory by design.
+# Builds ImageToIcon into bin/<configuration>/<rid>/.
+# Debug: linux-x64 only. Release: linux-x64 and win-x64 in separate subdirectories.
 # Usage: $0 [Debug|Release]
 
 set -euo pipefail
@@ -58,6 +58,7 @@ echo -e "\n${ul}${white}Building ${green}${ul}ImageToIcon [$configuration]${whit
 
 publish() {
     local rid="$1"
+    local out="$OUT_BASE/$rid"
 
     echo -e "${white}Platform:${nc} $rid"
 
@@ -69,13 +70,13 @@ publish() {
     dotnet publish "$CSPROJ" \
         --configuration "$configuration" \
         --runtime "$rid" \
-        --output "$OUT_BASE" \
+        --output "$out" \
         --nologo \
         -v minimal \
         "${extra[@]}"
 
     if [[ "$configuration" == "Release" ]]; then
-        find "$OUT_BASE" -name "*.pdb" -delete
+        find "$out" -name "*.pdb" -delete
     fi
 }
 
