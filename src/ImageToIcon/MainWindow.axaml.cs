@@ -24,11 +24,7 @@ public partial class MainWindow : Window
     private Image<Rgba32>? _sourceImage;
     private string? _sourceName;
 
-    public MainWindow() : this(null)
-    {
-    }
-
-    public MainWindow(string? startupFile)
+    public MainWindow(string? startupFile = null)
     {
         InitializeComponent();
 
@@ -48,11 +44,12 @@ public partial class MainWindow : Window
         var selected = new HashSet<int>(settings.SelectedSizes);
         var defaults = new HashSet<int>(IconFactory.DefaultSizes);
         var union = new SortedSet<int>(Comparer<int>.Create((a, b) => b.CompareTo(a)));
-        foreach (var s in IconFactory.DefaultSizes) union.Add(s);
-        foreach (var s in settings.CustomSizes) union.Add(s);
-        foreach (var size in union)
+        foreach (var s in IconFactory.DefaultSizes)
+            union.Add(s);
+        foreach (var s in settings.CustomSizes)
+            union.Add(s);
+        foreach (var toggle in union.Select(size => new SizeToggle(size, selected.Contains(size), !defaults.Contains(size))))
         {
-            var toggle = new SizeToggle(size, selected.Contains(size), !defaults.Contains(size));
             toggle.PropertyChanged += Toggle_PropertyChanged;
             _sizeToggles.Add(toggle);
         }
@@ -107,7 +104,8 @@ public partial class MainWindow : Window
     private void LoadFromPath(string path)
     {
         var img = ImageLoader.TryLoad(path);
-        if (img == null) return;
+        if (img == null)
+            return;
         _sourceImage?.Dispose();
         _sourceImage = img;
         _sourceName = Path.GetFileNameWithoutExtension(path);
@@ -117,7 +115,8 @@ public partial class MainWindow : Window
 
     private void UpdateAvailability()
     {
-        if (_sourceImage == null) return;
+        if (_sourceImage == null)
+            return;
         var maxDim = Math.Max(_sourceImage.Width, _sourceImage.Height);
         foreach (var t in _sizeToggles)
             t.IsAvailable = t.Size <= maxDim;
@@ -138,7 +137,8 @@ public partial class MainWindow : Window
         }
 
         _thumbs.Clear();
-        if (_sourceImage == null) return;
+        if (_sourceImage == null)
+            return;
         var maxDim = Math.Max(_sourceImage.Width, _sourceImage.Height);
         var sizes = _sizeToggles
                     .Where(t => t is { IsChecked: true, IsAvailable: true })
@@ -146,7 +146,8 @@ public partial class MainWindow : Window
                     .OrderByDescending(s => s);
         foreach (var size in sizes)
         {
-            if (size > maxDim) continue;
+            if (size > maxDim)
+                continue;
             var resized = _sourceImage.Clone(ctx => ctx.Resize(new ResizeOptions
             {
                 Size = new Size(size, size),
@@ -173,7 +174,8 @@ public partial class MainWindow : Window
 
     private async Task SaveIconAsync()
     {
-        if (_thumbs.Count == 0) return;
+        if (_thumbs.Count == 0)
+            return;
         var suggested = (_sourceName ?? "icon") + ".ico";
         var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
@@ -185,7 +187,8 @@ public partial class MainWindow : Window
                 new FilePickerFileType("Icon file") { Patterns = ["*.ico"] }
             ]
         });
-        if (file == null) return;
+        if (file == null)
+            return;
         var images = _thumbs.Select(t => t.Source.Clone(_ => { }));
         try
         {
@@ -212,13 +215,15 @@ public partial class MainWindow : Window
     {
         var files = e.DataTransfer.TryGetFiles();
         var path = files?.FirstOrDefault()?.Path.LocalPath;
-        if (path == null || !ImageLoader.IsSupported(path)) return;
+        if (path == null || !ImageLoader.IsSupported(path))
+            return;
 
         // If dropped on a specific thumb, replace only that one
         if (e.Source is Control c && FindThumb(c) is { } thumb)
         {
             var newImg = ImageLoader.TryLoad(path);
-            if (newImg == null) return;
+            if (newImg == null)
+                return;
             var resized = newImg.Clone(ctx => ctx.Resize(new ResizeOptions
             {
                 Size = new Size(thumb.Size, thumb.Size),
@@ -241,7 +246,8 @@ public partial class MainWindow : Window
     {
         while (c != null)
         {
-            if (c.Tag is IconThumb t) return t;
+            if (c.Tag is IconThumb t)
+                return t;
             c = c.Parent as Control;
         }
 
@@ -251,13 +257,15 @@ public partial class MainWindow : Window
     private void InsertSorted(SizeToggle t)
     {
         var i = 0;
-        while (i < _sizeToggles.Count && _sizeToggles[i].Size > t.Size) i++;
+        while (i < _sizeToggles.Count && _sizeToggles[i].Size > t.Size)
+            i++;
         _sizeToggles.Insert(i, t);
     }
 
     private void ApplyAvailabilityTo(SizeToggle t)
     {
-        if (_sourceImage == null) return;
+        if (_sourceImage == null)
+            return;
         var maxDim = Math.Max(_sourceImage.Width, _sourceImage.Height);
         t.IsAvailable = t.Size <= maxDim;
     }
@@ -266,7 +274,8 @@ public partial class MainWindow : Window
     {
         var used = new HashSet<int>(_sizeToggles.Select(t => t.Size));
         var newSize = await SizeInputDialog.ShowAsync(this, null, used);
-        if (newSize == null) return;
+        if (newSize == null)
+            return;
         var toggle = new SizeToggle(newSize.Value, true, true);
         toggle.PropertyChanged += Toggle_PropertyChanged;
         InsertSorted(toggle);
@@ -278,7 +287,8 @@ public partial class MainWindow : Window
     {
         var used = new HashSet<int>(_sizeToggles.Where(x => x != t).Select(x => x.Size));
         var newSize = await SizeInputDialog.ShowAsync(this, t.Size, used);
-        if (newSize == null || newSize == t.Size) return;
+        if (newSize == null || newSize == t.Size)
+            return;
         var wasChecked = t.IsChecked;
         t.PropertyChanged -= Toggle_PropertyChanged;
         _sizeToggles.Remove(t);
@@ -319,8 +329,10 @@ public partial class MainWindow : Window
     {
         try
         {
-            if (sender is not Control { Tag: IconThumb thumb } c) return;
-            if (!e.GetCurrentPoint(c).Properties.IsLeftButtonPressed) return;
+            if (sender is not Control { Tag: IconThumb thumb } c)
+                return;
+            if (!e.GetCurrentPoint(c).Properties.IsLeftButtonPressed)
+                return;
 
             var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {

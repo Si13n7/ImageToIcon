@@ -63,7 +63,7 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="Auto,Auto">
+    <Grid RowDefinitions="*,Auto">
 
         <Border Grid.Row="0" Padding="8" Background="{DynamicResource AppCategoryBrush}">
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
@@ -101,28 +101,27 @@
             </ScrollViewer>
         </Border>
 
-        <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center"
+        <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Stretch"
                     Spacing="12" Margin="8,14">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
-                <ItemsControl x:Name="SizeToggles">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" Spacing="4" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="m:SizeToggle">
-                            <ToggleButton Classes="pill"
-                                          Classes.unavailable="{Binding !IsAvailable}"
-                                          Content="{Binding Label}"
-                                          IsChecked="{Binding IsChecked, Mode=TwoWay}"
-                                          ContextRequested="Pill_ContextRequested" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-                <Button x:Name="AddSizeBtn" Classes="pill" Content="+"
-                        ToolTip.Tip="Add a custom size" />
-            </StackPanel>
+            <ItemsControl x:Name="SizeToggles" HorizontalAlignment="Center" MaxWidth="720">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="m:SizeToggle">
+                        <ToggleButton Classes="pill" Margin="2"
+                                      Classes.unavailable="{Binding !IsAvailable}"
+                                      Content="{Binding Label}"
+                                      IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                      ContextRequested="Pill_ContextRequested" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Button x:Name="AddSizeBtn" Classes="pill" Content="+ Add custom size"
+                    HorizontalAlignment="Center"
+                    ToolTip.Tip="Add a custom size" />
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
                 <Button x:Name="OpenBtn" Content="Open Image" Width="120"
                         HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
