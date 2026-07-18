@@ -12,7 +12,6 @@ using ImageToIcon.Ui;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Image = SixLabors.ImageSharp.Image;
 using Size = SixLabors.ImageSharp.Size;
 
 namespace ImageToIcon;
@@ -88,9 +87,10 @@ public partial class MainWindow : Window
     {
         try
         {
-            var uri = new Uri("avares://ImageToIcon/Assets/Symbol.png");
+            var uri = new Uri("avares://ImageToIcon/Assets/Symbol.svg");
             using var stream = AssetLoader.Open(uri);
-            _sourceImage = Image.Load<Rgba32>(stream);
+            _sourceImage = SvgLoader.TryLoad(stream);
+            if (_sourceImage == null) return;
             _sourceName = "icon";
             UpdateAvailability();
             RebuildThumbs();

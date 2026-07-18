@@ -19,8 +19,14 @@ public static class ImageLoader
         ["WebP Image"] = [".webp"]
     };
 
+    public static readonly Dictionary<string, string[]> VectorCategories = new()
+    {
+        ["SVG Image"] = SvgLoader.Extensions
+    };
+
     public static readonly Dictionary<string, string[]> Categories =
-        RasterCategories.Concat(IconReader.Categories)
+        RasterCategories.Concat(VectorCategories)
+                        .Concat(IconReader.Categories)
                         .OrderBy(kv => kv.Key, StringComparer.OrdinalIgnoreCase)
                         .ToDictionary(kv => kv.Key, kv => kv.Value);
 
@@ -53,10 +59,11 @@ public static class ImageLoader
     {
         try
         {
-            if (!File.Exists(path)) return null;
+            if (!File.Exists(path))
+                return null;
             if (IconReader.IsSupported(path))
                 return IconReader.TryLoad(path);
-            return Image.Load<Rgba32>(path);
+            return SvgLoader.IsSupported(path) ? SvgLoader.TryLoad(path) : Image.Load<Rgba32>(path);
         }
         catch
         {
