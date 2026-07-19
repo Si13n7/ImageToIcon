@@ -48,7 +48,7 @@ public static class Program
 
         var sizes = ParseSizes(args) ?? IconFactory.DefaultSizes.ToArray();
 
-        var inputs = args.Where(a => !a.StartsWith('-') && !a.StartsWith('/') && ImageLoader.IsSupported(a));
+        var inputs = args.Where(a => !IsSwitch(a) && ImageLoader.IsSupported(a));
         var any = false;
         foreach (var file in inputs)
         {
@@ -105,6 +105,17 @@ public static class Program
                         .Distinct()
                         .ToArray();
         return parsed.Length > 0 ? parsed : null;
+    }
+
+    private static bool IsSwitch(string arg)
+    {
+        if (arg.Length < 2)
+            return false;
+        if (arg.StartsWith("--"))
+            return true;
+        if (arg[0] == '/' && arg.IndexOf('/', 1) < 0 && !arg.Contains('\\'))
+            return true;
+        return false;
     }
 
     private static void PrintHelp()

@@ -16,15 +16,24 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var startupFile =
-                desktop.Args?.FirstOrDefault(a => !a.StartsWith('-')
-                                                  && !a.StartsWith('/')
-                                                  && ImageLoader.IsSupported(a)
-                                                  && File.Exists(a));
+            var startupFile = desktop.Args?.FirstOrDefault(a => !IsSwitch(a)
+                                                                && ImageLoader.IsSupported(a)
+                                                                && File.Exists(a));
 
             desktop.MainWindow = new MainWindow(startupFile);
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private static bool IsSwitch(string arg)
+    {
+        if (arg.Length < 2)
+            return false;
+        if (arg.StartsWith("--"))
+            return true;
+        if (arg[0] == '/' && arg.IndexOf('/', 1) < 0 && !arg.Contains('\\'))
+            return true;
+        return false;
     }
 }
