@@ -7,6 +7,8 @@ public class Settings
 {
     public int[] SelectedSizes { get; set; } = IconFactory.DefaultSizes.ToArray();
     public int[] CustomSizes { get; set; } = [];
+    public DateTime LastUpdateCheckUtc { get; set; }
+    public string PendingUpdateVersion { get; set; } = "";
 
     private static string ConfigPath
     {

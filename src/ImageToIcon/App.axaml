@@ -20,6 +20,7 @@
                     <SolidColorBrush x:Key="AppSubTextBrush" Color="#444458" />
                     <SolidColorBrush x:Key="AppTextBrush" Color="#111111" />
                     <SolidColorBrush x:Key="AppThumbBorderBrush" Color="#1E88E5" />
+                    <SolidColorBrush x:Key="AppUpdateBrush" Color="#F5B061" />
                     <SolidColorBrush x:Key="AppWindowBrush" Color="#F5F5F7" />
                     <SolidColorBrush x:Key="ButtonBackground" Color="#DADADF" />
                     <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#E2EAF8" />
@@ -58,6 +59,7 @@
                     <SolidColorBrush x:Key="AppSubTextBrush" Color="#888888" />
                     <SolidColorBrush x:Key="AppTextBrush" Color="#DCDCDC" />
                     <SolidColorBrush x:Key="AppThumbBorderBrush" Color="#4FC3F7" />
+                    <SolidColorBrush x:Key="AppUpdateBrush" Color="#B36A1E" />
                     <SolidColorBrush x:Key="AppWindowBrush" Color="#1D2122" />
                     <SolidColorBrush x:Key="ButtonBackground" Color="#272727" />
                     <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#2A2A2A" />

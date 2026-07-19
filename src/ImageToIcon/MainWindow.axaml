@@ -123,6 +123,10 @@
                     HorizontalAlignment="Center"
                     ToolTip.Tip="Add a custom size" />
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                <Button x:Name="UpdateBtn" Width="120" IsVisible="False"
+                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                        Background="{DynamicResource AppUpdateBrush}"
+                        Foreground="Black" />
                 <Button x:Name="OpenBtn" Content="Open Image" Width="120"
                         HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
                 <Button x:Name="SaveBtn" Content="Save Icon" Width="120"

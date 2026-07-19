@@ -18,8 +18,12 @@ namespace ImageToIcon;
 
 public partial class MainWindow : Window
 {
+    private readonly CancellationTokenSource _cts = new();
+    private readonly SelfUpdateCoordinator _selfUpdate;
+    private readonly Settings _settings;
     private readonly ObservableCollection<SizeToggle> _sizeToggles = [];
     private readonly ObservableCollection<IconThumb> _thumbs = [];
+    private readonly Button _updateBtn;
     private Image<Rgba32>? _sourceImage;
     private string? _sourceName;
 
@@ -33,23 +37,25 @@ public partial class MainWindow : Window
 
         WindowAutoRecenter.Attach(this);
 
-        var settings = Settings.Load();
+        _settings = Settings.Load();
+        _selfUpdate = new SelfUpdateCoordinator(_settings, _cts.Token);
 
         var openBtn = this.FindControl<Button>("OpenBtn")!;
         var saveBtn = this.FindControl<Button>("SaveBtn")!;
         var addSizeBtn = this.FindControl<Button>("AddSizeBtn")!;
+        _updateBtn = this.FindControl<Button>("UpdateBtn")!;
         var panel = this.FindControl<ItemsControl>("ImgPanel")!;
         var toggles = this.FindControl<ItemsControl>("SizeToggles")!;
 
         panel.ItemsSource = _thumbs;
         toggles.ItemsSource = _sizeToggles;
 
-        var selected = new HashSet<int>(settings.SelectedSizes);
+        var selected = new HashSet<int>(_settings.SelectedSizes);
         var defaults = new HashSet<int>(IconFactory.DefaultSizes);
         var union = new SortedSet<int>(Comparer<int>.Create((a, b) => b.CompareTo(a)));
         foreach (var s in IconFactory.DefaultSizes)
             union.Add(s);
-        foreach (var s in settings.CustomSizes)
+        foreach (var s in _settings.CustomSizes)
             union.Add(s);
         foreach (var toggle in union.Select(size => new SizeToggle(size, selected.Contains(size), !defaults.Contains(size))))
         {
@@ -60,15 +66,21 @@ public partial class MainWindow : Window
         openBtn.Click += async (_, _) => await OpenImageAsync();
         saveBtn.Click += async (_, _) => await SaveIconAsync();
         addSizeBtn.Click += async (_, _) => await AddCustomSizeAsync();
+        _updateBtn.Click += async (_, _) => await OnUpdateClickAsync();
+
+        // Show cached pending update immediately, then check in background.
+        RefreshUpdateButton();
+        Opened += (_, _) => _ = CheckForUpdateAsync();
 
         AddHandler(DragDrop.DropEvent, OnWindowDrop);
         AddHandler(DragDrop.DragOverEvent, OnWindowDragOver);
 
         Closing += (_, _) =>
         {
-            settings.SelectedSizes = _sizeToggles.Where(t => t.IsChecked).Select(t => t.Size).ToArray();
-            settings.CustomSizes = _sizeToggles.Where(t => t.IsCustom).Select(t => t.Size).ToArray();
-            settings.Save();
+            _settings.SelectedSizes = _sizeToggles.Where(t => t.IsChecked).Select(t => t.Size).ToArray();
+            _settings.CustomSizes = _sizeToggles.Where(t => t.IsCustom).Select(t => t.Size).ToArray();
+            _settings.Save();
+            _cts.Cancel();
             _sourceImage?.Dispose();
         };
 
@@ -364,6 +376,59 @@ public partial class MainWindow : Window
         catch
         {
             // ignored
+        }
+    }
+
+    private void RefreshUpdateButton()
+    {
+        var version = _selfUpdate.Pending?.Version
+                      ?? (Version.TryParse(_settings.PendingUpdateVersion, out var v) ? v : null);
+        if (version == null)
+        {
+            _updateBtn.IsVisible = false;
+            return;
+        }
+
+        _updateBtn.Content = $"Update {version}";
+        ToolTip.SetTip(_updateBtn, $"Install ImageToIcon {version}");
+        _updateBtn.IsVisible = true;
+    }
+
+    private async Task CheckForUpdateAsync()
+    {
+        try
+        {
+            await _selfUpdate.CheckAsync();
+        }
+        catch
+        {
+            // best-effort
+        }
+
+        RefreshUpdateButton();
+    }
+
+    private async Task OnUpdateClickAsync()
+    {
+        var pending = _selfUpdate.Pending;
+        var version = pending?.Version
+                      ?? (Version.TryParse(_settings.PendingUpdateVersion, out var v) ? v : null);
+        if (version == null)
+            return;
+
+        var body = await SelfUpdater.FetchLatestBodyAsync(CancellationToken.None);
+        var confirmed = await ChangelogDialog.ShowAsync(this, version, body);
+        if (!confirmed)
+            return;
+
+        _updateBtn.IsEnabled = false;
+        try
+        {
+            await UpdateProgressDialog.RunAsync(this, _selfUpdate);
+        }
+        finally
+        {
+            _updateBtn.IsEnabled = true;
         }
     }
 }
