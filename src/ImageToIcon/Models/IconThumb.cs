@@ -26,7 +26,11 @@ public class IconThumb(int size, Image<Rgba32> source)
     private static Bitmap ToAvaloniaBitmap(Image<Rgba32> img)
     {
         using var ms = new MemoryStream();
-        img.Save(ms, new PngEncoder());
+        img.Save(ms, new PngEncoder
+        {
+            ColorType = PngColorType.RgbWithAlpha,
+            BitDepth = PngBitDepth.Bit8
+        });
         ms.Position = 0;
         return new Bitmap(ms);
     }
