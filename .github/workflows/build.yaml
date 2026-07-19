@@ -43,7 +43,11 @@ jobs:
             archives+=("$name")
           done
           combined="ImageToIcon_both-platforms-x64_${stamp}.zip"
-          (cd bin/Release && zip -r "../../${combined}" linux-x64 win-x64)
+          combined_stage="$(mktemp -d)"
+          cp bin/Release/linux-x64/ImageToIcon "$combined_stage/"
+          cp bin/Release/win-x64/ImageToIcon.exe "$combined_stage/"
+          (cd "$combined_stage" && zip -r "${GITHUB_WORKSPACE}/${combined}" .)
+          rm -rf "$combined_stage"
           archives+=("$combined")
           printf 'archives<<EOF\n%s\nEOF\n' "$(printf '%s\n' "${archives[@]}")" >> "$GITHUB_OUTPUT"
 
