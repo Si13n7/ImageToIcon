@@ -35,6 +35,9 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
+        if (OperatingSystem.IsWindows())
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
         WindowAutoRecenter.Attach(this);
 
         _settings = Settings.Load();
