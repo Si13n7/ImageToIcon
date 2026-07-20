@@ -23,7 +23,9 @@ public partial class MainWindow : Window
     private readonly SelfUpdateCoordinator _selfUpdate;
     private readonly Settings _settings;
     private readonly ObservableCollection<SizeToggle> _sizeToggles = [];
-    private readonly ObservableCollection<IconThumb> _thumbs = [];
+    private readonly ItemsControl? _smallPanel;
+    private readonly ObservableCollection<IconThumb> _smallThumbs = [];
+    private readonly ObservableCollection<IconThumb> _topThumbs = [];
     private readonly Button _updateBtn;
     private Image<Rgba32>? _sourceImage;
     private string? _sourceName;
@@ -50,10 +52,12 @@ public partial class MainWindow : Window
         var saveBtn = this.FindControl<Button>("SaveBtn")!;
         var addSizeBtn = this.FindControl<Button>("AddSizeBtn")!;
         _updateBtn = this.FindControl<Button>("UpdateBtn")!;
-        var panel = this.FindControl<ItemsControl>("ImgPanel")!;
+        var topPanel = this.FindControl<ItemsControl>("TopThumbs")!;
+        _smallPanel = this.FindControl<ItemsControl>("SmallThumbs")!;
         var toggles = this.FindControl<ItemsControl>("SizeToggles")!;
 
-        panel.ItemsSource = _thumbs;
+        topPanel.ItemsSource = _topThumbs;
+        _smallPanel.ItemsSource = _smallThumbs;
         toggles.ItemsSource = _sizeToggles;
 
         var selected = new HashSet<int>(_settings.SelectedSizes);
@@ -194,13 +198,14 @@ public partial class MainWindow : Window
 
     private void RebuildThumbs()
     {
-        foreach (var t in _thumbs)
+        foreach (var t in _topThumbs.Concat(_smallThumbs))
         {
             t.Source.Dispose();
             t.Preview.Dispose();
         }
 
-        _thumbs.Clear();
+        _topThumbs.Clear();
+        _smallThumbs.Clear();
         if (_sourceImage == null)
             return;
         var maxDim = Math.Max(_sourceImage.Width, _sourceImage.Height);
@@ -218,8 +223,20 @@ public partial class MainWindow : Window
                 Mode = ResizeMode.Pad,
                 Sampler = KnownResamplers.Lanczos3
             }));
-            _thumbs.Add(new IconThumb(size, resized));
+            CollectionFor(size).Add(new IconThumb(size, resized));
         }
+
+        // Cap the small-thumb column height at the active top-frame height
+        // so WrapPanel breaks into a new column instead of growing forever.
+        if (_smallPanel == null)
+            return;
+        var topSize = _topThumbs.FirstOrDefault()?.Size;
+        _smallPanel.MaxHeight = topSize ?? double.PositiveInfinity;
+    }
+
+    private ObservableCollection<IconThumb> CollectionFor(int size)
+    {
+        return size >= 256 ? _topThumbs : _smallThumbs;
     }
 
     private async Task OpenImageAsync()
@@ -238,7 +255,7 @@ public partial class MainWindow : Window
 
     private async Task SaveIconAsync()
     {
-        if (_thumbs.Count == 0)
+        if (_topThumbs.Count == 0 && _smallThumbs.Count == 0)
             return;
         var suggested = (_sourceName ?? "icon") + ".ico";
         var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
@@ -253,7 +270,9 @@ public partial class MainWindow : Window
         });
         if (file == null)
             return;
-        var images = _thumbs.Select(t => t.Source.Clone(_ => { }));
+        var images = _topThumbs.Concat(_smallThumbs)
+                               .OrderByDescending(t => t.Size)
+                               .Select(t => t.Source.Clone(_ => { }));
         try
         {
             IconFactory.Save(images, file.Path.LocalPath);
@@ -295,11 +314,11 @@ public partial class MainWindow : Window
                 Sampler = KnownResamplers.Lanczos3
             }));
             newImg.Dispose();
-            var idx = _thumbs.IndexOf(thumb);
+            var col = CollectionFor(thumb.Size);
+            var idx = col.IndexOf(thumb);
             thumb.Replace(resized);
-            _thumbs[idx] = thumb; // trigger refresh
-            _thumbs.RemoveAt(idx);
-            _thumbs.Insert(idx, thumb);
+            col.RemoveAt(idx);
+            col.Insert(idx, thumb);
             return;
         }
 
@@ -413,10 +432,11 @@ public partial class MainWindow : Window
                 Sampler = KnownResamplers.Lanczos3
             }));
             img.Dispose();
-            var idx = _thumbs.IndexOf(thumb);
+            var col = CollectionFor(thumb.Size);
+            var idx = col.IndexOf(thumb);
             thumb.Replace(resized);
-            _thumbs.RemoveAt(idx);
-            _thumbs.Insert(idx, thumb);
+            col.RemoveAt(idx);
+            col.Insert(idx, thumb);
         }
         catch
         {

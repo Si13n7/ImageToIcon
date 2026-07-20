@@ -63,41 +63,53 @@
         </Style>
     </Window.Styles>
 
+    <Window.Resources>
+        <DataTemplate x:Key="ThumbTemplate" DataType="m:IconThumb">
+            <StackPanel Margin="2" Spacing="2"
+                        ToolTip.Tip="{Binding TooltipText}"
+                        Cursor="Hand"
+                        Tag="{Binding}"
+                        Background="Transparent"
+                        PointerPressed="Thumb_PointerPressed"
+                        DragDrop.AllowDrop="True">
+                <Grid Width="{Binding DisplaySize}" Height="{Binding DisplaySize}">
+                    <Image Source="{Binding Preview}" Stretch="Fill" />
+                    <Rectangle Stroke="{DynamicResource AppThumbBorderBrush}"
+                               StrokeThickness="1"
+                               StrokeDashArray="2,2"
+                               IsHitTestVisible="False" />
+                </Grid>
+                <TextBlock Text="{Binding SizeLabel}"
+                           Foreground="{DynamicResource AppThumbBorderBrush}"
+                           FontFamily="Calibri" FontWeight="Bold" FontSize="10"
+                           HorizontalAlignment="Right"
+                           IsHitTestVisible="False" />
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+
     <Grid RowDefinitions="*,Auto">
 
         <Border Grid.Row="0" Padding="8" Background="{DynamicResource AppCategoryBrush}">
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <ItemsControl x:Name="ImgPanel">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="m:IconThumb">
-                            <StackPanel Margin="2" Spacing="2"
-                                        ToolTip.Tip="{Binding TooltipText}"
-                                        Cursor="Hand"
-                                        Tag="{Binding}"
-                                        Background="Transparent"
-                                        PointerPressed="Thumb_PointerPressed"
-                                        DragDrop.AllowDrop="True">
-                                <Grid Width="{Binding DisplaySize}" Height="{Binding DisplaySize}">
-                                    <Image Source="{Binding Preview}" Stretch="Fill" />
-                                    <Rectangle Stroke="{DynamicResource AppThumbBorderBrush}"
-                                               StrokeThickness="1"
-                                               StrokeDashArray="2,2"
-                                               IsHitTestVisible="False" />
-                                </Grid>
-                                <TextBlock Text="{Binding SizeLabel}"
-                                           Foreground="{DynamicResource AppThumbBorderBrush}"
-                                           FontFamily="Calibri" FontWeight="Bold" FontSize="10"
-                                           HorizontalAlignment="Right"
-                                           IsHitTestVisible="False" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center">
+                    <ItemsControl x:Name="TopThumbs"
+                                  ItemTemplate="{StaticResource ThumbTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                    <ItemsControl x:Name="SmallThumbs"
+                                  ItemTemplate="{StaticResource ThumbTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </StackPanel>
             </ScrollViewer>
         </Border>
 
