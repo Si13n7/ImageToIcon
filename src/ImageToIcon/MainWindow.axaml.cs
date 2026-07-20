@@ -28,6 +28,8 @@ public partial class MainWindow : Window
     private Image<Rgba32>? _sourceImage;
     private string? _sourceName;
 
+    private bool _suppressTopFrameSync;
+
     public MainWindow() : this(null)
     {
     }
@@ -66,6 +68,14 @@ public partial class MainWindow : Window
             toggle.PropertyChanged += Toggle_PropertyChanged;
             _sizeToggles.Add(toggle);
         }
+
+        // Persisted state may have multiple >=256 sizes checked; keep only
+        // the largest to match the runtime radio-style rule.
+        var topKeep = _sizeToggles
+                      .Where(t => t is { Size: >= 256, IsChecked: true })
+                      .MaxBy(t => t.Size);
+        if (topKeep != null)
+            EnforceTopFrameExclusivity(topKeep);
 
         openBtn.Click += async (_, _) => await OpenImageAsync();
         saveBtn.Click += async (_, _) => await SaveIconAsync();
@@ -151,8 +161,35 @@ public partial class MainWindow : Window
 
     private void Toggle_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(SizeToggle.IsChecked))
-            RebuildThumbs();
+        if (e.PropertyName != nameof(SizeToggle.IsChecked))
+            return;
+
+        // Windows only ever picks the largest available frame from anything
+        // >= 256, so treat that band as radio-style: checking one clears
+        // the others, but nothing gets permanently disabled.
+        if (sender is SizeToggle { Size: >= 256, IsChecked: true } changed)
+            EnforceTopFrameExclusivity(changed);
+
+        RebuildThumbs();
+    }
+
+    private void EnforceTopFrameExclusivity(SizeToggle keep)
+    {
+        if (_suppressTopFrameSync)
+            return;
+        _suppressTopFrameSync = true;
+        try
+        {
+            foreach (var t in _sizeToggles)
+            {
+                if (t != keep && t.Size >= 256)
+                    t.IsChecked = false;
+            }
+        }
+        finally
+        {
+            _suppressTopFrameSync = false;
+        }
     }
 
     private void RebuildThumbs()
@@ -289,14 +326,6 @@ public partial class MainWindow : Window
         _sizeToggles.Insert(i, t);
     }
 
-    private void ApplyAvailabilityTo(SizeToggle t)
-    {
-        if (_sourceImage == null)
-            return;
-        var maxDim = Math.Max(_sourceImage.Width, _sourceImage.Height);
-        t.IsAvailable = t.Size <= maxDim;
-    }
-
     private async Task AddCustomSizeAsync()
     {
         var used = new HashSet<int>(_sizeToggles.Select(t => t.Size));
@@ -306,7 +335,9 @@ public partial class MainWindow : Window
         var toggle = new SizeToggle(newSize.Value, true, true);
         toggle.PropertyChanged += Toggle_PropertyChanged;
         InsertSorted(toggle);
-        ApplyAvailabilityTo(toggle);
+        UpdateAvailability();
+        if (toggle.Size >= 256)
+            EnforceTopFrameExclusivity(toggle);
         RebuildThumbs();
     }
 
@@ -322,7 +353,9 @@ public partial class MainWindow : Window
         var nt = new SizeToggle(newSize.Value, wasChecked, true);
         nt.PropertyChanged += Toggle_PropertyChanged;
         InsertSorted(nt);
-        ApplyAvailabilityTo(nt);
+        UpdateAvailability();
+        if (nt is { Size: >= 256, IsChecked: true })
+            EnforceTopFrameExclusivity(nt);
         RebuildThumbs();
     }
 
@@ -330,6 +363,7 @@ public partial class MainWindow : Window
     {
         t.PropertyChanged -= Toggle_PropertyChanged;
         _sizeToggles.Remove(t);
+        UpdateAvailability();
         RebuildThumbs();
     }
 
