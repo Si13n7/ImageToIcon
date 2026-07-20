@@ -91,7 +91,7 @@
     <Grid RowDefinitions="*,Auto">
 
         <Border Grid.Row="0" Padding="8" Background="{DynamicResource AppCategoryBrush}">
-            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center">
                     <ItemsControl x:Name="TopThumbs"
                                   ItemTemplate="{StaticResource ThumbTemplate}">

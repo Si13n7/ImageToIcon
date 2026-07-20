@@ -226,12 +226,68 @@ public partial class MainWindow : Window
             CollectionFor(size).Add(new IconThumb(size, resized));
         }
 
-        // Cap the small-thumb column height at the active top-frame height
-        // so WrapPanel breaks into a new column instead of growing forever.
         if (_smallPanel == null)
             return;
         var topSize = _topThumbs.FirstOrDefault()?.Size;
-        _smallPanel.MaxHeight = topSize ?? double.PositiveInfinity;
+        _smallPanel.MaxHeight = topSize == null
+            ? double.PositiveInfinity
+            : ComputeSmallColumnCap(topSize.Value);
+    }
+
+    // Start with the top-frame height as column cap; if columns would push the
+    // window past the screen width, grow the cap so fewer columns are needed —
+    // window trades horizontal for vertical growth. Scrollbars only kick in
+    // once the cap already fills the screen height.
+    private double ComputeSmallColumnCap(int topSize)
+    {
+        const double thumbLabelPadding = 20;
+        const double thumbMargin = 6;
+        const double horizontalChrome = 80;
+        const double verticalChrome = 220;
+
+        var screen = Screens.Primary ?? Screens.All.FirstOrDefault();
+        if (screen == null || _smallThumbs.Count == 0)
+            return topSize + thumbLabelPadding;
+
+        var scale = RenderScaling <= 0 ? 1.0 : RenderScaling;
+        var screenW = screen.WorkingArea.Width / scale;
+        var screenH = screen.WorkingArea.Height / scale;
+        var topW = topSize + thumbMargin;
+        var availSmallW = Math.Max(100, screenW - topW - horizontalChrome);
+        var maxCap = Math.Max(topSize + thumbLabelPadding, screenH - verticalChrome);
+
+        var cap = topSize + thumbLabelPadding;
+        const double step = 32;
+        while (true)
+        {
+            var totalW = MeasureColumnsWidth(cap, thumbLabelPadding, thumbMargin);
+            if (totalW <= availSmallW || cap >= maxCap)
+                return cap;
+            cap = Math.Min(cap + step, maxCap);
+        }
+    }
+
+    private double MeasureColumnsWidth(double cap, double labelPadding, double margin)
+    {
+        double totalW = 0, colH = 0, colW = 0;
+        foreach (var t in _smallThumbs)
+        {
+            var h = t.Size + labelPadding;
+            var w = t.Size + margin;
+            if (colH > 0 && colH + h > cap)
+            {
+                totalW += colW;
+                colH = 0;
+                colW = 0;
+            }
+
+            colH += h;
+            colW = Math.Max(colW, w);
+        }
+
+        if (colH > 0)
+            totalW += colW;
+        return totalW;
     }
 
     private ObservableCollection<IconThumb> CollectionFor(int size)
