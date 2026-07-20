@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
+using ImageToIcon.Platform;
 using ImageToIcon.Services;
 
 namespace ImageToIcon.Ui;
@@ -66,6 +67,7 @@ public sealed class UpdateProgressDialog
             }
         };
         _closeBtn.Click += (_, _) => _dlg.Close();
+        _dlg.Opened += (_, _) => Win32Window.ApplyDarkTitlebar(_dlg);
     }
 
     public static async Task RunAsync(Window owner, SelfUpdateCoordinator coordinator)

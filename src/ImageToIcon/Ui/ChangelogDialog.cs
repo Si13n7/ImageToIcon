@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Media;
+using ImageToIcon.Platform;
 
 namespace ImageToIcon.Ui;
 
@@ -112,6 +113,7 @@ public static class ChangelogDialog
         };
         cancelBtn.Click += (_, _) => dlg.Close();
 
+        dlg.Opened += (_, _) => Win32Window.ApplyDarkTitlebar(dlg);
         await dlg.ShowDialog(owner);
         return confirmed;
     }

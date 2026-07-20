@@ -7,6 +7,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using ImageToIcon.Models;
+using ImageToIcon.Platform;
 using ImageToIcon.Services;
 using ImageToIcon.Ui;
 using SixLabors.ImageSharp;
@@ -73,7 +74,11 @@ public partial class MainWindow : Window
 
         // Show cached pending update immediately, then check in background.
         RefreshUpdateButton();
-        Opened += (_, _) => _ = CheckForUpdateAsync();
+        Opened += (_, _) =>
+        {
+            Win32Window.ApplyDarkTitlebar(this);
+            _ = CheckForUpdateAsync();
+        };
 
         AddHandler(DragDrop.DropEvent, OnWindowDrop);
         AddHandler(DragDrop.DragOverEvent, OnWindowDragOver);
