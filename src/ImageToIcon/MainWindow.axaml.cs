@@ -80,6 +80,9 @@ public partial class MainWindow : Window
             _ = CheckForUpdateAsync();
         };
 
+        if (Application.Current is { } app)
+            app.ActualThemeVariantChanged += (_, _) => Win32Window.ApplyDarkTitlebar(this);
+
         AddHandler(DragDrop.DropEvent, OnWindowDrop);
         AddHandler(DragDrop.DragOverEvent, OnWindowDragOver);
 
