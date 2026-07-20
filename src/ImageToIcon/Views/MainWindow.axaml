@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:m="using:ImageToIcon.Models"
         mc:Ignorable="d"
-        x:Class="ImageToIcon.MainWindow"
+        x:Class="ImageToIcon.Views.MainWindow"
         Title="Image To Icon"
         SizeToContent="WidthAndHeight"
         CanResize="False"
@@ -126,14 +126,13 @@
                         <ToggleButton Classes="pill" Margin="2"
                                       Classes.unavailable="{Binding !IsAvailable}"
                                       Content="{Binding Label}"
-                                      IsChecked="{Binding IsChecked, Mode=TwoWay}"
-                                      ContextRequested="Pill_ContextRequested" />
+                                      IsChecked="{Binding IsChecked, Mode=TwoWay}" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <Button x:Name="AddSizeBtn" Classes="pill" Content="+ Add custom size"
+            <Button x:Name="AddSizeBtn" Classes="pill" Content="+ Add sizes"
                     HorizontalAlignment="Center"
-                    ToolTip.Tip="Add a custom size" />
+                    ToolTip.Tip="Add sizes" />
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
                 <Button x:Name="UpdateBtn" Width="120" IsVisible="False"
                         HorizontalContentAlignment="Center" VerticalContentAlignment="Center"

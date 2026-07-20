@@ -1,0 +1,97 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:m="using:ImageToIcon.Models"
+        x:Class="ImageToIcon.Views.AddSizesDialog"
+        Title="Add Sizes"
+        SizeToContent="WidthAndHeight"
+        CanResize="False"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource AppWindowBrush}"
+        Foreground="{DynamicResource AppTextBrush}">
+
+    <Window.Styles>
+        <Style Selector="ToggleButton.cell">
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Padding" Value="6,3" />
+            <Setter Property="Margin" Value="1" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontFamily" Value="Cascadia Mono,Consolas,DejaVu Sans Mono,monospace" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Right" />
+        </Style>
+        <Style Selector="ToggleButton.pill">
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Padding" Value="10,4" />
+            <Setter Property="Margin" Value="1" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontFamily" Value="Cascadia Mono,Consolas,DejaVu Sans Mono,monospace" />
+        </Style>
+        <Style Selector="NumericUpDown">
+            <Setter Property="Background" Value="{DynamicResource AppCategoryBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppControlBorderBrush}" />
+        </Style>
+        <Style Selector="NumericUpDown TextBox">
+            <Setter Property="Background" Value="{DynamicResource AppCategoryBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppControlBorderBrush}" />
+        </Style>
+        <Style Selector="ButtonSpinner">
+            <Setter Property="Background" Value="{DynamicResource AppCategoryBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppControlBorderBrush}" />
+        </Style>
+    </Window.Styles>
+
+    <StackPanel Margin="16" Spacing="8">
+
+        <TextBlock Text="DPI scaling  (rows: base size · columns: scale):" FontSize="12" />
+        <Grid x:Name="DpiGrid" />
+
+        <TextBlock Text="Replacements for the top frame:" FontSize="11" Margin="0,8,0,0" />
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            <TextBlock Text="256" FontSize="12" FontWeight="Bold" Opacity="0.5"
+                       FontFamily="Cascadia Mono,Consolas,DejaVu Sans Mono,monospace"
+                       VerticalAlignment="Center" Margin="4,0,8,0" />
+            <ItemsControl x:Name="HighResItems">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="m:SizeCellVm">
+                        <ToggleButton Classes="cell"
+                                      Content="{Binding SizeText}"
+                                      IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                      IsEnabled="{Binding !IsReserved}"
+                                      ToolTip.Tip="{Binding Tooltip}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+
+        <TextBlock Text="Custom size:" FontSize="11" Margin="0,8,0,0" />
+        <WrapPanel x:Name="CustomRow" Orientation="Horizontal">
+            <NumericUpDown x:Name="CustomInput" Value="128"
+                           Increment="1" FormatString="0" Width="120"
+                           FontFamily="Cascadia Mono,Consolas,DejaVu Sans Mono,monospace"
+                           Margin="0,0,6,0" />
+            <Button x:Name="AddCustomBtn" Content="Add" Width="60"
+                    HorizontalContentAlignment="Center" Margin="0,0,6,0" />
+            <TextBlock x:Name="CustomError" FontSize="12" Foreground="OrangeRed"
+                       VerticalAlignment="Center" IsVisible="False" />
+        </WrapPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
+            <Button x:Name="OkBtn" Content="OK" Width="80" IsDefault="True"
+                    HorizontalContentAlignment="Center" />
+            <Button x:Name="CancelBtn" Content="Cancel" Width="80" IsCancel="True"
+                    HorizontalContentAlignment="Center" />
+        </StackPanel>
+
+    </StackPanel>
+</Window>

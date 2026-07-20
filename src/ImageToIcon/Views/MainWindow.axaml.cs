@@ -15,7 +15,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Size = SixLabors.ImageSharp.Size;
 
-namespace ImageToIcon;
+namespace ImageToIcon.Views;
 
 public partial class MainWindow : Window
 {
@@ -347,62 +347,36 @@ public partial class MainWindow : Window
 
     private async Task AddCustomSizeAsync()
     {
-        var used = new HashSet<int>(_sizeToggles.Select(t => t.Size));
-        var newSize = await SizeInputDialog.ShowAsync(this, null, used);
-        if (newSize == null)
+        var defaults = new HashSet<int>(IconFactory.DefaultSizes);
+        var currentCustom = _sizeToggles.Where(t => t.IsCustom).Select(t => t.Size).ToHashSet();
+        var result = await AddSizesDialog.ShowAsync(this, defaults, currentCustom);
+        if (result == null)
             return;
-        var toggle = new SizeToggle(newSize.Value, true, true);
-        toggle.PropertyChanged += Toggle_PropertyChanged;
-        InsertSorted(toggle);
-        UpdateAvailability();
-        if (toggle.Size >= 256)
-            EnforceTopFrameExclusivity(toggle);
-        RebuildThumbs();
-    }
 
-    private async Task EditCustomSizeAsync(SizeToggle t)
-    {
-        var used = new HashSet<int>(_sizeToggles.Where(x => x != t).Select(x => x.Size));
-        var newSize = await SizeInputDialog.ShowAsync(this, t.Size, used);
-        if (newSize == null || newSize == t.Size)
-            return;
-        var wasChecked = t.IsChecked;
-        t.PropertyChanged -= Toggle_PropertyChanged;
-        _sizeToggles.Remove(t);
-        var nt = new SizeToggle(newSize.Value, wasChecked, true);
-        nt.PropertyChanged += Toggle_PropertyChanged;
-        InsertSorted(nt);
-        UpdateAvailability();
-        if (nt is { Size: >= 256, IsChecked: true })
-            EnforceTopFrameExclusivity(nt);
-        RebuildThumbs();
-    }
-
-    private void RemoveCustomSize(SizeToggle t)
-    {
-        t.PropertyChanged -= Toggle_PropertyChanged;
-        _sizeToggles.Remove(t);
-        UpdateAvailability();
-        RebuildThumbs();
-    }
-
-    private void Pill_ContextRequested(object? sender, ContextRequestedEventArgs e)
-    {
-        if (sender is not Control { DataContext: SizeToggle { IsCustom: true } t } ctrl)
+        var target = new HashSet<int>(result);
+        foreach (var t in _sizeToggles.Where(t => t.IsCustom && !target.Contains(t.Size)).ToList())
         {
-            e.Handled = true;
-            return;
+            t.PropertyChanged -= Toggle_PropertyChanged;
+            _sizeToggles.Remove(t);
         }
 
-        var menu = new ContextMenu();
-        var edit = new MenuItem { Header = "Edit..." };
-        edit.Click += async (_, _) => await EditCustomSizeAsync(t);
-        var remove = new MenuItem { Header = "Remove" };
-        remove.Click += (_, _) => RemoveCustomSize(t);
-        menu.Items.Add(edit);
-        menu.Items.Add(remove);
-        menu.Open(ctrl);
-        e.Handled = true;
+        var existing = _sizeToggles.Select(t => t.Size).ToHashSet();
+        foreach (var size in target)
+        {
+            if (existing.Contains(size))
+                continue;
+            var toggle = new SizeToggle(size, true, true);
+            toggle.PropertyChanged += Toggle_PropertyChanged;
+            InsertSorted(toggle);
+        }
+
+        UpdateAvailability();
+        var topKeep = _sizeToggles
+                      .Where(t => t is { Size: >= 256, IsChecked: true })
+                      .MaxBy(t => t.Size);
+        if (topKeep != null)
+            EnforceTopFrameExclusivity(topKeep);
+        RebuildThumbs();
     }
 
     private async void Thumb_PointerPressed(object? sender, PointerPressedEventArgs e)

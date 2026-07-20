@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using ImageToIcon.Services;
+using ImageToIcon.Views;
 
 namespace ImageToIcon;
 
@@ -32,8 +33,6 @@ public class App : Application
             return false;
         if (arg.StartsWith("--"))
             return true;
-        if (arg[0] == '/' && arg.IndexOf('/', 1) < 0 && !arg.Contains('\\'))
-            return true;
-        return false;
+        return arg[0] == '/' && arg.IndexOf('/', 1) < 0 && !arg.Contains('\\');
     }
 }
