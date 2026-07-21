@@ -14,7 +14,6 @@ namespace ImageToIcon.Views;
 
 public partial class AddSizesDialog : Window
 {
-    private static readonly FontFamily MonoFont = new("Cascadia Mono,Consolas,DejaVu Sans Mono,monospace");
     private static readonly int[] Bases = [16, 24, 32, 48];
 
     private static readonly int[] Scales =
@@ -34,9 +33,11 @@ public partial class AddSizesDialog : Window
     private readonly NumericUpDown _customInput;
     private readonly WrapPanel _customRow;
 
+    private readonly List<SizeCellVm> _dpiCellVms = [];
     private readonly Grid _dpiGrid;
     private readonly ItemsControl _highResItems;
     private readonly Button _okBtn;
+    private readonly Button _selectAllBtn;
     private HashSet<int> _reserved = [];
     private int[]? _result;
 
@@ -51,7 +52,12 @@ public partial class AddSizesDialog : Window
         _customError = this.FindControl<TextBlock>("CustomError")!;
         _okBtn = this.FindControl<Button>("OkBtn")!;
         _cancelBtn = this.FindControl<Button>("CancelBtn")!;
+        _selectAllBtn = this.FindControl<Button>("SelectAllBtn")!;
     }
+
+    private static FontFamily MonoFont =>
+        Application.Current!.FindResource("AppMonoFontFamily") as FontFamily
+        ?? FontFamily.Default;
 
     private void InitializeComponent()
     {
@@ -86,6 +92,15 @@ public partial class AddSizesDialog : Window
         }
 
         _addCustomBtn.Click += (_, _) => OnAddCustom();
+        _selectAllBtn.Click += (_, _) => OnSelectAllToggle();
+        foreach (var vm in _dpiCellVms.Where(v => !v.IsReserved))
+            vm.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(SizeCellVm.IsChecked))
+                    UpdateSelectAllLabel();
+            };
+        UpdateSelectAllLabel();
+
         _okBtn.Click += (_, _) =>
         {
             _result = CollectResult();
@@ -132,7 +147,6 @@ public partial class AddSizesDialog : Window
             {
                 Text = $"{Scales[c]}%",
                 FontSize = 11,
-                FontFamily = MonoFont,
                 Opacity = 0.7,
                 Margin = new Thickness(2),
                 HorizontalAlignment = HorizontalAlignment.Center
@@ -150,6 +164,7 @@ public partial class AddSizesDialog : Window
                 FontSize = 12,
                 FontFamily = MonoFont,
                 FontWeight = FontWeight.Bold,
+                Opacity = 0.5,
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(4, 0, 8, 0)
             };
@@ -160,7 +175,10 @@ public partial class AddSizesDialog : Window
             for (var c = 0; c < Scales.Length; c++)
             {
                 var size = Bases[r] * Scales[c] / 100;
-                var btn = MakeCellButton(GetOrCreateVm(size));
+                var vm = GetOrCreateVm(size);
+                if (!_dpiCellVms.Contains(vm))
+                    _dpiCellVms.Add(vm);
+                var btn = MakeCellButton(vm);
                 Grid.SetRow(btn, r + 1);
                 Grid.SetColumn(btn, c + 1);
                 _dpiGrid.Children.Add(btn);
@@ -191,6 +209,23 @@ public partial class AddSizesDialog : Window
         foreach (var size in HighRes)
             vms.Add(GetOrCreateVm(size));
         _highResItems.ItemsSource = vms;
+    }
+
+    private void OnSelectAllToggle()
+    {
+        var target = !AllDpiChecked();
+        foreach (var vm in _dpiCellVms.Where(v => !v.IsReserved))
+            vm.IsChecked = target;
+    }
+
+    private bool AllDpiChecked()
+    {
+        return _dpiCellVms.Where(v => !v.IsReserved).All(v => v.IsChecked);
+    }
+
+    private void UpdateSelectAllLabel()
+    {
+        _selectAllBtn.Content = AllDpiChecked() ? "Deselect all" : "Select all";
     }
 
     private void OnAddCustom()

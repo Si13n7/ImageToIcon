@@ -8,6 +8,7 @@
 
     <Application.Resources>
         <ResourceDictionary>
+            <FontFamily x:Key="AppMonoFontFamily">Cascadia Mono,Consolas,DejaVu Sans Mono,monospace</FontFamily>
             <ResourceDictionary.ThemeDictionaries>
 
                 <ResourceDictionary x:Key="Light">
