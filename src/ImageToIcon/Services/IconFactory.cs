@@ -43,7 +43,7 @@ public static class IconFactory
         Save(images, fs);
     }
 
-    private static void Save(IEnumerable<Image<Rgba32>> images, Stream stream)
+    public static void Save(IEnumerable<Image<Rgba32>> images, Stream stream)
     {
         var list = images
                    .Where(i => i is { Width: >= MinSize and <= MaxSize, Height: >= MinSize and <= MaxSize })

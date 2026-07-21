@@ -1,10 +1,12 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
@@ -15,6 +17,9 @@ using ImageToIcon.Ui;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using Color = Avalonia.Media.Color;
+using Image = SixLabors.ImageSharp.Image;
+using Point = Avalonia.Point;
 using Size = SixLabors.ImageSharp.Size;
 
 namespace ImageToIcon.Views;
@@ -29,6 +34,8 @@ public partial class MainWindow : Window
     private readonly ObservableCollection<IconThumb> _smallThumbs = [];
     private readonly ObservableCollection<IconThumb> _topThumbs = [];
     private readonly Button _updateBtn;
+    private bool _debugPreview;
+    private bool _iconIsDebug;
     private Task _rebuildChain = Task.CompletedTask;
     private CancellationTokenSource? _rebuildCts;
     private Image<Rgba32>? _sourceImage;
@@ -61,6 +68,13 @@ public partial class MainWindow : Window
         var toggles = this.FindControl<ItemsControl>("SizeToggles")!;
         var borderToggle = this.FindControl<ToggleButton>("BorderToggle")!;
         borderToggle.IsChecked = _settings.ShowThumbBorders;
+        var debugToggle = this.FindControl<ToggleButton>("DebugToggle")!;
+        debugToggle.Click += (_, _) =>
+        {
+            _debugPreview = debugToggle.IsChecked == true;
+            openBtn.IsEnabled = !_debugPreview;
+            RebuildThumbs();
+        };
 
         topPanel.ItemsSource = _topThumbs;
         _smallPanel.ItemsSource = _smallThumbs;
@@ -75,7 +89,7 @@ public partial class MainWindow : Window
             union.Add(s);
         foreach (var toggle in union.Select(size => new SizeToggle(size, selected.Contains(size), !defaults.Contains(size))))
         {
-            toggle.PropertyChanged += Toggle_PropertyChanged;
+            toggle.PropertyChanged += OnTogglePropertyChanged;
             _sizeToggles.Add(toggle);
         }
 
@@ -192,7 +206,7 @@ public partial class MainWindow : Window
             t.IsAvailable = t.Size <= maxDim;
     }
 
-    private void Toggle_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void OnTogglePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName != nameof(SizeToggle.IsChecked))
             return;
@@ -282,8 +296,16 @@ public partial class MainWindow : Window
                 _smallPanel.MaxHeight = ComputeSmallColumnCap(topSize.Value);
         }
 
-        foreach (var thumb in thumbs)
+        for (var i = 0; i < thumbs.Count; i++)
         {
+            var thumb = thumbs[i];
+            if (_debugPreview)
+            {
+                var (dbgSrc, dbgPreview) = RenderDebugFrame(thumb.Size, i, thumbs.Count);
+                thumb.Fill(dbgSrc, dbgPreview);
+                continue;
+            }
+
             (Image<Rgba32> src, Bitmap preview) pair;
             try
             {
@@ -314,6 +336,151 @@ public partial class MainWindow : Window
 
             thumb.Fill(pair.src, pair.preview);
         }
+
+        ApplyTitlebarIcon();
+    }
+
+    private void ApplyTitlebarIcon()
+    {
+        if (_debugPreview)
+        {
+            var frames = _topThumbs.Concat(_smallThumbs)
+                                   .Where(t => t.Source != null)
+                                   .OrderByDescending(t => t.Size)
+                                   .Select(t => t.Source!.Clone(_ => { }))
+                                   .ToList();
+            if (frames.Count == 0)
+                return;
+            try
+            {
+                using var ms = new MemoryStream();
+                IconFactory.Save(frames, ms);
+                ms.Position = 0;
+                Icon = new WindowIcon(ms);
+                _iconIsDebug = true;
+            }
+            finally
+            {
+                foreach (var f in frames)
+                    f.Dispose();
+            }
+
+            return;
+        }
+
+        if (!_iconIsDebug)
+            return;
+        try
+        {
+            using var stream = AssetLoader.Open(new Uri("avares://ImageToIcon/Assets/ProgramIcon.ico"));
+            Icon = new WindowIcon(stream);
+        }
+        catch
+        {
+            // ignored
+        }
+
+        _iconIsDebug = false;
+    }
+
+    private static (Image<Rgba32> src, Bitmap preview) RenderDebugFrame(int size, int index, int total)
+    {
+        var bg = IntenseColorFor(index, total);
+        var pixelSize = new PixelSize(size, size);
+        var rtb = new RenderTargetBitmap(pixelSize, new Vector(96, 96));
+        using (var ctx = rtb.CreateDrawingContext())
+        {
+            ctx.FillRectangle(new SolidColorBrush(bg), new Rect(0, 0, size, size));
+            var label = size.ToString();
+            var fontSize = Math.Max(8, size * 0.65);
+            var text = new FormattedText(
+                label,
+                CultureInfo.InvariantCulture,
+                FlowDirection.LeftToRight,
+                Typeface.Default,
+                fontSize,
+                Brushes.White);
+            var maxWidth = size * 0.85;
+            if (text.Width > maxWidth)
+            {
+                fontSize *= maxWidth / text.Width;
+                text = new FormattedText(
+                    label,
+                    CultureInfo.InvariantCulture,
+                    FlowDirection.LeftToRight,
+                    Typeface.Default,
+                    fontSize,
+                    Brushes.White);
+            }
+
+            var pos = new Point(
+                (size - text.Width) / 2,
+                (size - text.Height) / 2);
+            ctx.DrawText(text, pos);
+        }
+
+        using var ms = new MemoryStream();
+        rtb.Save(ms, new PngBitmapEncoderOptions());
+        var bytes = ms.ToArray();
+        var img = Image.Load<Rgba32>(bytes);
+        var bmp = new Bitmap(new MemoryStream(bytes));
+        rtb.Dispose();
+        return (img, bmp);
+    }
+
+    private static Color IntenseColorFor(int index, int total)
+    {
+        var step = total > 0 ? 360.0 / total : 137.508;
+        var hue = index * step % 360;
+        var sat = 0.75 + index % 3 * 0.08;
+        var light = 0.45 + index % 2 * 0.1;
+        return FromHsl(hue, sat, light);
+    }
+
+    private static Color FromHsl(double h, double s, double l)
+    {
+        var c = (1 - Math.Abs(2 * l - 1)) * s;
+        var x = c * (1 - Math.Abs(h / 60 % 2 - 1));
+        var m = l - c / 2;
+        double r, g, b;
+        switch (h)
+        {
+            case < 60:
+                r = c;
+                g = x;
+                b = 0;
+                break;
+            case < 120:
+                r = x;
+                g = c;
+                b = 0;
+                break;
+            case < 180:
+                r = 0;
+                g = c;
+                b = x;
+                break;
+            case < 240:
+                r = 0;
+                g = x;
+                b = c;
+                break;
+            case < 300:
+                r = x;
+                g = 0;
+                b = c;
+                break;
+            default:
+                r = c;
+                g = 0;
+                b = x;
+                break;
+        }
+
+        return Color.FromRgb(
+            (byte)Math.Round((r + m) * 255),
+            (byte)Math.Round((g + m) * 255),
+            (byte)Math.Round((b + m) * 255));
     }
 
     // Start with the top-frame height as column cap; if columns would push the
@@ -438,13 +605,21 @@ public partial class MainWindow : Window
         }
     }
 
-    private static void OnWindowDragOver(object? sender, DragEventArgs e)
+    private void OnWindowDragOver(object? sender, DragEventArgs e)
     {
+        if (_debugPreview)
+        {
+            e.DragEffects = DragDropEffects.None;
+            return;
+        }
+
         e.DragEffects = e.DataTransfer.Contains(DataFormat.File) ? DragDropEffects.Copy : DragDropEffects.None;
     }
 
     private void OnWindowDrop(object? sender, DragEventArgs e)
     {
+        if (_debugPreview)
+            return;
         var files = e.DataTransfer.TryGetFiles();
         var path = files?.FirstOrDefault()?.Path.LocalPath;
         if (path == null || !ImageLoader.IsSupported(path))
@@ -505,7 +680,7 @@ public partial class MainWindow : Window
         var target = new HashSet<int>(result);
         foreach (var t in _sizeToggles.Where(t => t.IsCustom && !target.Contains(t.Size)).ToList())
         {
-            t.PropertyChanged -= Toggle_PropertyChanged;
+            t.PropertyChanged -= OnTogglePropertyChanged;
             _sizeToggles.Remove(t);
         }
 
@@ -515,7 +690,7 @@ public partial class MainWindow : Window
             if (existing.Contains(size))
                 continue;
             var toggle = new SizeToggle(size, true, true);
-            toggle.PropertyChanged += Toggle_PropertyChanged;
+            toggle.PropertyChanged += OnTogglePropertyChanged;
             InsertSorted(toggle);
         }
 
@@ -528,10 +703,12 @@ public partial class MainWindow : Window
         RebuildThumbs();
     }
 
-    private async void Thumb_PointerPressed(object? sender, PointerPressedEventArgs e)
+    private async void OnThumbPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         try
         {
+            if (_debugPreview)
+                return;
             if (sender is not Control { Tag: IconThumb thumb } c)
                 return;
             if (!e.GetCurrentPoint(c).Properties.IsLeftButtonPressed)

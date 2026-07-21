@@ -69,6 +69,21 @@
             <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPressed}" />
             <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPressed}" />
         </Style>
+        <Style Selector="ToggleButton.debugtoggle:checked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AppThumbBorderBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppThumbBorderBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="ToggleButton.debugtoggle:checked:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AppThumbBorderBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppThumbBorderBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="ToggleButton.debugtoggle:checked:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AppThumbBorderBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppThumbBorderBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
         <Style Selector="Button.pill">
             <Setter Property="MinWidth" Value="0" />
             <Setter Property="MinHeight" Value="0" />
@@ -95,7 +110,7 @@
                         Cursor="Hand"
                         Tag="{Binding}"
                         Background="Transparent"
-                        PointerPressed="Thumb_PointerPressed"
+                        PointerPressed="OnThumbPointerPressed"
                         DragDrop.AllowDrop="True">
                 <Grid Width="{Binding DisplaySize}" Height="{Binding DisplaySize}">
                     <Image Source="{Binding Preview}" Stretch="Fill" />
@@ -138,15 +153,25 @@
                         </ItemsControl>
                     </StackPanel>
                 </ScrollViewer>
-                <ToggleButton x:Name="BorderToggle" Grid.Row="1" Classes="iconbtn" IsChecked="True"
-                              HorizontalAlignment="Left" Margin="0,4,0,0"
-                              ToolTip.Tip="Toggle thumb borders">
-                    <Rectangle Width="12" Height="12"
-                               Stroke="{DynamicResource ButtonForeground}"
-                               StrokeThickness="1"
-                               StrokeDashArray="2,2"
-                               Opacity="0.65" />
-                </ToggleButton>
+                <StackPanel Grid.Row="1" Orientation="Horizontal"
+                            HorizontalAlignment="Left" Margin="0,4,0,0" Spacing="4">
+                    <ToggleButton x:Name="BorderToggle" Classes="iconbtn" IsChecked="True"
+                                  ToolTip.Tip="Toggle thumb borders">
+                        <Rectangle Width="12" Height="12"
+                                   Stroke="{DynamicResource ButtonForeground}"
+                                   StrokeThickness="1"
+                                   StrokeDashArray="2,2"
+                                   Opacity="0.65" />
+                    </ToggleButton>
+                    <ToggleButton x:Name="DebugToggle" Classes="iconbtn debugtoggle"
+                                  ToolTip.Tip="Show size labels instead of previews (session only)">
+                        <TextBlock Text="123" FontSize="9" FontWeight="Bold"
+                                   Opacity="0.65"
+                                   Height="12"
+                                   TextAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </ToggleButton>
+                </StackPanel>
             </Grid>
         </Border>
 
