@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
@@ -92,6 +93,13 @@ public partial class AddSizesDialog : Window
         }
 
         _addCustomBtn.Click += (_, _) => OnAddCustom();
+        _customInput.KeyDown += (_, e) =>
+        {
+            if (e.Key != Key.Enter)
+                return;
+            e.Handled = true;
+            OnAddCustom();
+        };
         _selectAllBtn.Click += (_, _) => OnSelectAllToggle();
         foreach (var vm in _dpiCellVms.Where(v => !v.IsReserved))
             vm.PropertyChanged += (_, e) =>
