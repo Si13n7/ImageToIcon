@@ -429,7 +429,7 @@ public partial class MainWindow : Window
                 label,
                 CultureInfo.InvariantCulture,
                 FlowDirection.LeftToRight,
-                Typeface.Default,
+                new Typeface(Typeface.Default.FontFamily, weight: FontWeight.Bold),
                 fontSize,
                 Brushes.White);
             var maxWidth = size * 0.85;
@@ -440,7 +440,7 @@ public partial class MainWindow : Window
                     label,
                     CultureInfo.InvariantCulture,
                     FlowDirection.LeftToRight,
-                    Typeface.Default,
+                    new Typeface(Typeface.Default.FontFamily, weight: FontWeight.Bold),
                     fontSize,
                     Brushes.White);
             }
