@@ -27,6 +27,8 @@ public partial class MainWindow : Window
     private readonly ObservableCollection<IconThumb> _smallThumbs = [];
     private readonly ObservableCollection<IconThumb> _topThumbs = [];
     private readonly Button _updateBtn;
+    private Task _rebuildChain = Task.CompletedTask;
+    private CancellationTokenSource? _rebuildCts;
     private Image<Rgba32>? _sourceImage;
     private string? _sourceName;
 
@@ -106,7 +108,7 @@ public partial class MainWindow : Window
             _settings.CustomSizes = _sizeToggles.Where(t => t.IsCustom).Select(t => t.Size).ToArray();
             _settings.Save();
             _cts.Cancel();
-            _sourceImage?.Dispose();
+            _rebuildCts?.Cancel();
         };
 
         if (startupFile != null)
@@ -142,16 +144,38 @@ public partial class MainWindow : Window
         }
     }
 
-    private void LoadFromPath(string path)
+    private async void LoadFromPath(string path)
     {
-        var img = ImageLoader.TryLoad(path);
-        if (img == null)
-            return;
-        _sourceImage?.Dispose();
-        _sourceImage = img;
-        _sourceName = Path.GetFileNameWithoutExtension(path);
-        UpdateAvailability();
-        RebuildThumbs();
+        try
+        {
+            var img = ImageLoader.TryLoad(path);
+            if (img == null)
+                return;
+            await CancelAndAwaitRebuildAsync();
+            _sourceImage?.Dispose();
+            _sourceImage = img;
+            _sourceName = Path.GetFileNameWithoutExtension(path);
+            UpdateAvailability();
+            RebuildThumbs();
+        }
+        catch
+        {
+            // ignored
+        }
+    }
+
+    private async Task CancelAndAwaitRebuildAsync()
+    {
+        if (_rebuildCts != null)
+            await _rebuildCts.CancelAsync();
+        try
+        {
+            await _rebuildChain;
+        }
+        catch
+        {
+            // ignored — cancellation
+        }
     }
 
     private void UpdateAvailability()
@@ -198,6 +222,26 @@ public partial class MainWindow : Window
 
     private void RebuildThumbs()
     {
+        _rebuildChain = RebuildThumbsChainedAsync(_rebuildChain);
+    }
+
+    private async Task RebuildThumbsChainedAsync(Task previous)
+    {
+        if (_rebuildCts != null)
+            await _rebuildCts.CancelAsync();
+        try
+        {
+            await previous;
+        }
+        catch
+        {
+            // ignored — cancellation of prior run
+        }
+
+        var cts = new CancellationTokenSource();
+        _rebuildCts = cts;
+        var ct = cts.Token;
+
         foreach (var t in _topThumbs.Concat(_smallThumbs))
         {
             t.Source.Dispose();
@@ -206,32 +250,59 @@ public partial class MainWindow : Window
 
         _topThumbs.Clear();
         _smallThumbs.Clear();
-        if (_sourceImage == null)
+        _smallPanel?.MaxHeight = double.PositiveInfinity;
+
+        var source = _sourceImage;
+        if (source == null)
             return;
-        var maxDim = Math.Max(_sourceImage.Width, _sourceImage.Height);
+
+        var maxDim = Math.Max(source.Width, source.Height);
         var sizes = _sizeToggles
                     .Where(t => t is { IsChecked: true, IsAvailable: true })
                     .Select(t => t.Size)
-                    .OrderByDescending(s => s);
+                    .Where(s => s <= maxDim)
+                    .OrderByDescending(s => s)
+                    .ToList();
+
         foreach (var size in sizes)
         {
-            if (size > maxDim)
-                continue;
-            var resized = _sourceImage.Clone(ctx => ctx.Resize(new ResizeOptions
+            IconThumb thumb;
+            try
             {
-                Size = new Size(size, size),
-                Mode = ResizeMode.Pad,
-                Sampler = KnownResamplers.Lanczos3
-            }));
-            CollectionFor(size).Add(new IconThumb(size, resized));
-        }
+                thumb = await Task.Run(() =>
+                {
+                    ct.ThrowIfCancellationRequested();
+                    var resized = source.Clone(ctx => ctx.Resize(new ResizeOptions
+                    {
+                        Size = new Size(size, size),
+                        Mode = ResizeMode.Pad,
+                        Sampler = KnownResamplers.Lanczos3
+                    }));
+                    ct.ThrowIfCancellationRequested();
+                    return new IconThumb(size, resized);
+                }, ct);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
 
-        if (_smallPanel == null)
-            return;
-        var topSize = _topThumbs.FirstOrDefault()?.Size;
-        _smallPanel.MaxHeight = topSize == null
-            ? double.PositiveInfinity
-            : ComputeSmallColumnCap(topSize.Value);
+            if (ct.IsCancellationRequested)
+            {
+                thumb.Source.Dispose();
+                thumb.Preview.Dispose();
+                return;
+            }
+
+            CollectionFor(size).Add(thumb);
+
+            if (_smallPanel != null)
+            {
+                var topSize = _topThumbs.FirstOrDefault()?.Size;
+                if (topSize != null)
+                    _smallPanel.MaxHeight = ComputeSmallColumnCap(topSize.Value);
+            }
+        }
     }
 
     // Start with the top-frame height as column cap; if columns would push the
