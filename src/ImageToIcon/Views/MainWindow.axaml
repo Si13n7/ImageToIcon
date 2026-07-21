@@ -47,7 +47,7 @@
         <Style Selector="ToggleButton.iconbtn">
             <Setter Property="MinWidth" Value="0" />
             <Setter Property="MinHeight" Value="0" />
-            <Setter Property="Padding" Value="4,0" />
+            <Setter Property="Padding" Value="4,3" />
             <Setter Property="Background" Value="{DynamicResource ButtonBackground}" />
             <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrush}" />
             <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
@@ -141,9 +141,11 @@
                 <ToggleButton x:Name="BorderToggle" Grid.Row="1" Classes="iconbtn" IsChecked="True"
                               HorizontalAlignment="Left" Margin="0,4,0,0"
                               ToolTip.Tip="Toggle thumb borders">
-                    <TextBlock Text="&#x2B1A;" FontSize="12"
-                               VerticalAlignment="Center"
-                               Margin="0,0,0,3" />
+                    <Rectangle Width="12" Height="12"
+                               Stroke="{DynamicResource ButtonForeground}"
+                               StrokeThickness="1"
+                               StrokeDashArray="2,2"
+                               Opacity="0.65" />
                 </ToggleButton>
             </Grid>
         </Border>
