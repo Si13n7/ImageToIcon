@@ -42,6 +42,7 @@ public partial class MainWindow : Window
     private string? _sourceName;
 
     private bool _suppressTopFrameSync;
+    private TrayIcon? _trayIcon;
 
     public MainWindow() : this(null)
     {
@@ -128,6 +129,7 @@ public partial class MainWindow : Window
             _settings.Save();
             _cts.Cancel();
             _rebuildCts?.Cancel();
+            _trayIcon?.IsVisible = false;
         };
 
         if (startupFile != null)
@@ -355,8 +357,9 @@ public partial class MainWindow : Window
             {
                 using var ms = new MemoryStream();
                 IconFactory.Save(frames, ms);
-                ms.Position = 0;
-                Icon = new WindowIcon(ms);
+                var bytes = ms.ToArray();
+                Icon = new WindowIcon(new MemoryStream(bytes));
+                ShowDebugTrayIcon(bytes);
                 _iconIsDebug = true;
             }
             finally
@@ -368,6 +371,7 @@ public partial class MainWindow : Window
             return;
         }
 
+        HideDebugTrayIcon();
         if (!_iconIsDebug)
             return;
         try
@@ -381,6 +385,34 @@ public partial class MainWindow : Window
         }
 
         _iconIsDebug = false;
+    }
+
+    private void ShowDebugTrayIcon(byte[] icoBytes)
+    {
+        var app = Application.Current;
+        if (app == null)
+            return;
+
+        var icon = new WindowIcon(new MemoryStream(icoBytes));
+        if (_trayIcon == null)
+        {
+            _trayIcon = new TrayIcon
+            {
+                Icon = icon,
+                ToolTipText = "ImageToIcon (debug preview)",
+                IsVisible = true
+            };
+            TrayIcon.SetIcons(app, [_trayIcon]);
+            return;
+        }
+
+        _trayIcon.Icon = icon;
+        _trayIcon.IsVisible = true;
+    }
+
+    private void HideDebugTrayIcon()
+    {
+        _trayIcon?.IsVisible = false;
     }
 
     private static (Image<Rgba32> src, Bitmap preview) RenderDebugFrame(int size, int index, int total)
