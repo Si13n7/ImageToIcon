@@ -165,7 +165,7 @@
         <TextBlock Text="Custom size:" FontSize="11" Margin="0,8,0,0" />
         <WrapPanel x:Name="CustomRow" Orientation="Horizontal">
             <NumericUpDown x:Name="CustomInput" Value="128"
-                           Increment="2" FormatString="0" Width="65"
+                           Increment="2" FormatString="0" Width="72"
                            ClipValueToMinMax="True"
                            VerticalAlignment="Stretch"
                            VerticalContentAlignment="Center"
