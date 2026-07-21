@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
@@ -58,6 +59,8 @@ public partial class MainWindow : Window
         var topPanel = this.FindControl<ItemsControl>("TopThumbs")!;
         _smallPanel = this.FindControl<ItemsControl>("SmallThumbs")!;
         var toggles = this.FindControl<ItemsControl>("SizeToggles")!;
+        var borderToggle = this.FindControl<ToggleButton>("BorderToggle")!;
+        borderToggle.IsChecked = _settings.ShowThumbBorders;
 
         topPanel.ItemsSource = _topThumbs;
         _smallPanel.ItemsSource = _smallThumbs;
@@ -107,6 +110,7 @@ public partial class MainWindow : Window
         {
             _settings.SelectedSizes = _sizeToggles.Where(t => t.IsChecked).Select(t => t.Size).ToArray();
             _settings.CustomSizes = _sizeToggles.Where(t => t.IsCustom).Select(t => t.Size).ToArray();
+            _settings.ShowThumbBorders = borderToggle.IsChecked == true;
             _settings.Save();
             _cts.Cancel();
             _rebuildCts?.Cancel();
