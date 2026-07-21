@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using ImageToIcon.Models;
@@ -243,10 +244,7 @@ public partial class MainWindow : Window
         var ct = cts.Token;
 
         foreach (var t in _topThumbs.Concat(_smallThumbs))
-        {
-            t.Source.Dispose();
-            t.Preview.Dispose();
-        }
+            t.DisposeContent();
 
         _topThumbs.Clear();
         _smallThumbs.Clear();
@@ -264,22 +262,38 @@ public partial class MainWindow : Window
                     .OrderByDescending(s => s)
                     .ToList();
 
+        // Place empty placeholders first so the layout (columns, cap, window
+        // size) resolves immediately; fill each with its resized bitmap as
+        // the background work completes.
+        var thumbs = new List<IconThumb>(sizes.Count);
         foreach (var size in sizes)
         {
-            IconThumb thumb;
+            var thumb = new IconThumb(size);
+            thumbs.Add(thumb);
+            CollectionFor(size).Add(thumb);
+            if (_smallPanel == null)
+                continue;
+            var topSize = _topThumbs.FirstOrDefault()?.Size;
+            if (topSize != null)
+                _smallPanel.MaxHeight = ComputeSmallColumnCap(topSize.Value);
+        }
+
+        foreach (var thumb in thumbs)
+        {
+            (Image<Rgba32> src, Bitmap preview) pair;
             try
             {
-                thumb = await Task.Run(() =>
+                pair = await Task.Run(() =>
                 {
                     ct.ThrowIfCancellationRequested();
                     var resized = source.Clone(ctx => ctx.Resize(new ResizeOptions
                     {
-                        Size = new Size(size, size),
+                        Size = new Size(thumb.Size, thumb.Size),
                         Mode = ResizeMode.Pad,
                         Sampler = KnownResamplers.Lanczos3
                     }));
                     ct.ThrowIfCancellationRequested();
-                    return new IconThumb(size, resized);
+                    return (resized, IconThumb.ToAvaloniaBitmap(resized));
                 }, ct);
             }
             catch (OperationCanceledException)
@@ -289,19 +303,12 @@ public partial class MainWindow : Window
 
             if (ct.IsCancellationRequested)
             {
-                thumb.Source.Dispose();
-                thumb.Preview.Dispose();
+                pair.src.Dispose();
+                pair.preview.Dispose();
                 return;
             }
 
-            CollectionFor(size).Add(thumb);
-
-            if (_smallPanel != null)
-            {
-                var topSize = _topThumbs.FirstOrDefault()?.Size;
-                if (topSize != null)
-                    _smallPanel.MaxHeight = ComputeSmallColumnCap(topSize.Value);
-            }
+            thumb.Fill(pair.src, pair.preview);
         }
     }
 
@@ -384,6 +391,16 @@ public partial class MainWindow : Window
     {
         if (_topThumbs.Count == 0 && _smallThumbs.Count == 0)
             return;
+        // Wait for any in-flight rebuild so every thumb has its source ready.
+        try
+        {
+            await _rebuildChain;
+        }
+        catch
+        {
+            // ignored
+        }
+
         var suggested = (_sourceName ?? "icon") + ".ico";
         var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
@@ -398,8 +415,9 @@ public partial class MainWindow : Window
         if (file == null)
             return;
         var images = _topThumbs.Concat(_smallThumbs)
+                               .Where(t => t.Source != null)
                                .OrderByDescending(t => t.Size)
-                               .Select(t => t.Source.Clone(_ => { }));
+                               .Select(t => t.Source!.Clone(_ => { }));
         try
         {
             IconFactory.Save(images, file.Path.LocalPath);
